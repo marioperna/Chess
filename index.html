@@ -1,0 +1,4835 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Scacchi JS</title>
+		
+		<style>
+			*{
+				font-family:Verdana, San serif;
+			}
+			
+			body{
+				background-image: url("img/scacchiHome.jpeg");
+				background-repeat:no-repeat;
+			}
+			
+			div#tabella{
+				width:60%;
+				height:100%;
+				float:left;
+			}
+			
+			.bianco{
+				background-color:rgb(255,206,158);
+				text-align: center;
+			}
+			
+			.nero{
+				background-color:rgb(210,140,70);
+				text-align: center;
+			}
+			
+			td{
+				width:70px;
+				height:70px;
+				border: 2px solid black;
+			}
+			table{
+				border: 1px solid black;
+				border-collapse:collapse;
+				margin:auto;
+			}
+			
+			#giocatore1{
+				width:20%;
+				height:100%;
+				background-color: rgb(154, 167, 188);
+				margin:0%;
+				float:left;
+			}
+			
+			#giocatore2{
+				width:20%;
+				height:100%;
+				background-color: rgb(134, 167, 188);
+				float:left;			
+			}
+			
+			.riep
+			{
+				text-align:center;
+				font-size:18px;
+				color:yellow;
+				font-weight:bold;
+			}
+			
+			#s{
+				font-size:45px;
+				font-weight:bold;
+				color:red;
+			}
+			
+			.mosse{
+			color:yellow;			
+			}
+			
+			#selectUser{
+				width:40%;
+				margin:auto;
+				background-color:lightblue;
+			}
+			
+			#titolo{
+				text-align:center;
+				font-size:20px;
+				color:red;
+				padding:2%;
+				font-weight:bold;
+			}
+			
+			.adattaForm{			
+				padding-left:4%;			
+			}
+			
+			#bottoneInserimento{
+				padding:3%;
+				margin-left:36%;			
+			}
+			
+			#nomeGiocatore1{
+				font-weight:bold;
+				color:white;
+				text-align:center;
+			}
+			
+			#nomeGiocatore2{
+				font-weight:bold;
+				color:black;
+				text-align:center;
+			}
+
+			#pedoniEliminatiB{
+				background-color:lightgreen;
+				border:none;
+			}
+			
+			#pedoniEliminatiN{
+				background-color:lightgreen;
+				border:none;
+			}
+			
+			.pedineEliminatiTitolo{
+				color:#C21212;
+				font-weight:bold;
+				text-align:center;
+			}
+			
+			.mN{border:0px;}
+			
+			.mB{border:0px;}
+			
+		</style>
+		
+	</head>
+	<body>
+
+	<div id="selectUser">
+	<p id="titolo"> SCACCHI </p>
+	<p class="adattaForm">Nome Giocatore Bianco<input type="text" id="g_bianco" name="g_bianco"></p>
+	<p class="adattaForm">Nome Giocatore Nero	<input type="text" id="g_nero" name="g_nero"></p>
+	<div id="bottoneInserimento"><button onclick="inizio()"> Avvia la partita </button></div>
+	</div>
+	
+	
+		<div id="giocatore1">
+			<p class="riep">GIOCATORE BIANCO</p>
+			<p id="nomeGiocatore1"></p>
+			<hr>		
+			
+			<p class="pedineEliminatiTitolo">Pedine Eliminate</p>	
+			<div id="pedoniEliminatiB">
+				<br>
+				<table id="mortiBianchi">
+					<tr>
+						<td class="mB" id="pedoniBianchi"></td>
+						<td class="mB" id="contaPedoniBianchi"></td>
+					</tr>
+					<tr>
+						<td class="mB" id="torriBianche"></td>
+						<td class="mB" id="contaTorriBianche"></td>
+					</tr>
+					<tr>
+						<td class="mB" id="cavalliBianchi"></td>
+						<td class="mB" id="contaCavalliBianchi"></td>
+					</tr>
+					<tr>
+						<td class="mB" id="alfieriBianchi"></td>
+						<td class="mB" id="contaAlfieriBianchi"></td>
+					</tr>
+					<tr>
+						<td class="mB" id="regineBianche"></td>
+						<td class="mB" id="contaRegineBianche"></td>
+					</tr>
+				</table>
+				<br>
+  			</div>
+
+			<button id="restart" onclick="ricarica()">
+					Ricomincia
+				</button>
+		</div>
+		
+		<div id="tabella">
+		</div>
+			
+		<div id="giocatore2">
+			<p class="riep">GIOCATORE NERO</p>
+			<p id="nomeGiocatore2"></p>
+		<hr>		
+			
+			<p class="pedineEliminatiTitolo">Pedine Eliminate</p>	
+			<div id="pedoniEliminatiN">
+				<br>
+				<table id="mortiNeri">
+					<tr>
+						<td class="mN" id="pedoniNeri"></td>
+						<td class="mN" id="contaPedoniNeri"></td>
+					</tr>
+					<tr>
+						<td class="mN" id="torriNere"></td>
+						<td class="mN" id="contaTorriNere"></td>
+					</tr>
+					<tr>
+						<td class="mN" id="cavalliNeri"></td>
+						<td class="mN" id="contaCavalliNeri"></td>
+					</tr>
+					<tr>
+						<td class="mN" id="alfieriNeri"></td>
+						<td class="mN" id="contaAlfieriNeri"></td>
+					</tr>
+					<tr>
+						<td class="mN" id="regineNere"></td>
+						<td class="mN" id="contaRegineNere"></td>
+					</tr>
+				</table>
+				</br>
+  			</div>
+			<button id="restart" onclick="ricarica()">
+					Ricomincia
+				</button>
+		</div>
+	
+		<script>
+		
+		document.getElementById("restart").style.display = "none";
+
+		document.getElementById("tabella").style.display = "none";
+		document.getElementById("giocatore1").style.display = "none";
+		document.getElementById("giocatore2").style.display = "none";
+		
+		function inizio(){
+			var g_bianco = document.getElementById("g_bianco").value;
+			var g_nero = document.getElementById("g_nero").value;
+			
+			if(g_bianco=="")
+			g_bianco="Giocatore Bianco (Default)";
+			if(g_nero=="")
+			g_nero="Giocatore Nero (Default)";
+			
+			var schermoGiocatore1 = document.getElementById("nomeGiocatore1");
+			var schermoGiocatore2 = document.getElementById("nomeGiocatore2");
+		
+				document.getElementById("selectUser").style.display = "none";
+				schermoGiocatore1.innerHTML=""+g_bianco+" ";
+				schermoGiocatore2.innerHTML=""+g_nero+" ";
+				document.getElementById("tabella").style.display = "";
+				document.getElementById("giocatore1").style.display = "";
+				document.getElementById("giocatore2").style.display = "";
+				document.getElementById("restart").style.display = "";
+		}
+		function ricarica ()
+			{
+				window.location.reload()
+				document.getElementById("g_bianco").value = "";
+				document.getElementById("g_nero").value = "";
+				
+			}
+		
+
+		
+		var numero = 8;
+		elemento = document.getElementById("tabella");
+		var stringa = "<table>";
+		
+		for(var i = 1; i <= numero; i++){
+			stringa+="<tr>";
+			for(var j = 1; j <= numero; j++)
+			{
+				if((j+i)%2==0)
+				stringa+="<td class='nero' id='td"+i+j+"' onclick='cliccato("+i+","+j+")'><img id='img"+i+j+"' class='vuota' src='img/vuota.png'></td>";
+				else
+				stringa+="<td class='bianco' id='td"+i+j+"' onclick='cliccato("+i+","+j+")'><img id='img"+i+j+"' class='vuota' src='img/vuota.png'></td>";
+			}
+			stringa+="</tr>";
+		}
+		stringa += "</table>";
+		elemento.innerHTML = stringa;
+		
+		document.getElementById("img11").src="img/torre_n.png";
+		document.getElementById("img11").className = "torreN";
+		document.getElementById("img12").src="img/cavallo_n.png";
+		document.getElementById("img12").className = "cavalloN";
+		document.getElementById("img13").src="img/alfiere_n.png";
+		document.getElementById("img13").className = "alfiereN";
+		document.getElementById("img14").src="img/regina_n.png";
+		document.getElementById("img14").className = "reginaN";
+		document.getElementById("img15").src="img/re_n.png";
+		document.getElementById("img15").className = "reN";
+		document.getElementById("img16").src="img/alfiere_n.png";
+		document.getElementById("img16").className = "alfiereN";
+		document.getElementById("img17").src="img/cavallo_n.png";
+		document.getElementById("img17").className = "cavalloN";
+		document.getElementById("img18").src="img/torre_n.png";
+		document.getElementById("img18").className = "torreN";
+		document.getElementById("img21").src="img/pedone_n.png";
+		document.getElementById("img21").className = "pedoneN";
+		document.getElementById("img22").src="img/pedone_n.png";
+		document.getElementById("img22").className = "pedoneN";
+		document.getElementById("img23").src="img/pedone_n.png";
+		document.getElementById("img23").className = "pedoneN";
+		document.getElementById("img24").src="img/pedone_n.png";
+		document.getElementById("img24").className = "pedoneN";
+		document.getElementById("img25").src="img/pedone_n.png";
+		document.getElementById("img25").className = "pedoneN";
+		document.getElementById("img26").src="img/pedone_n.png";
+		document.getElementById("img26").className = "pedoneN";
+		document.getElementById("img27").src="img/pedone_n.png";
+		document.getElementById("img27").className = "pedoneN";
+		document.getElementById("img28").src="img/pedone_n.png";
+		document.getElementById("img28").className = "pedoneN";
+		
+		document.getElementById("img81").src="img/torre_b.png";
+		document.getElementById("img81").className = "torreB";
+		document.getElementById("img82").src="img/cavallo_b.png";
+		document.getElementById("img82").className = "cavalloB";
+		document.getElementById("img83").src="img/alfiere_b.png";
+		document.getElementById("img83").className = "alfiereB";
+		document.getElementById("img84").src="img/regina_b.png";
+		document.getElementById("img84").className = "reginaB";
+		document.getElementById("img85").src="img/re_b.png";
+		document.getElementById("img85").className = "reB";
+		document.getElementById("img86").src="img/alfiere_b.png";
+		document.getElementById("img86").className = "alfiereB";
+		document.getElementById("img87").src="img/cavallo_b.png";
+		document.getElementById("img87").className = "cavalloB";
+		document.getElementById("img88").src="img/torre_b.png";
+		document.getElementById("img88").className = "torreB";
+		document.getElementById("img71").src="img/pedone_b.png";
+		document.getElementById("img71").className = "pedoneB";
+		document.getElementById("img72").src="img/pedone_b.png";
+		document.getElementById("img72").className = "pedoneB";
+		document.getElementById("img73").src="img/pedone_b.png";
+		document.getElementById("img73").className = "pedoneB";
+		document.getElementById("img74").src="img/pedone_b.png";
+		document.getElementById("img74").className = "pedoneB";
+		document.getElementById("img75").src="img/pedone_b.png";
+		document.getElementById("img75").className = "pedoneB";
+		document.getElementById("img76").src="img/pedone_b.png";
+		document.getElementById("img76").className = "pedoneB";
+		document.getElementById("img77").src="img/pedone_b.png";
+		document.getElementById("img77").className = "pedoneB";
+		document.getElementById("img78").src="img/pedone_b.png";
+		document.getElementById("img78").className = "pedoneB";
+		
+				
+				
+		 vettore = new Array();
+		 vettore[0]="0";
+		 vettore[1]="0";
+		 possibileMovimento = new Array();
+		 possibileMangiataSX="0";
+		 possibileMangiataDX="0";
+		 possibileMangiataSu="0";
+		 possibileMangiataGiu="0";
+		 possibileMangiataSX2="0";
+		 possibileMangiataDX2="0";
+		 possibileMangiataSu2="0";
+		 possibileMangiataGiu2="0";
+		 contaMosse=0;
+		 ok=0;
+		 turno=1;
+		 mossaPossibileRe=0;
+		 iReNero=1;
+		 jReNero=5;
+		 iReBianco=8;
+		 jReBianco=5;
+		 casiPossibili=0;
+		 casiFavorevoli=0;
+		 contaMossePerArroccoNeroSinistra=0;
+		 contaMossePerArroccoNeroDestra=0;
+		 arroccoNeroDestraPossibile=0;
+		 arroccoNeroSinistraPossibile=0;
+		 contaMossePerArroccoBiancoSinistra=0;
+		 contaMossePerArroccoBiancoDestra=0;
+		 arroccoBiancoDestraPossibile=0;
+		 arroccoBiancoSinistraPossibile=0;
+		 giocatoreVincitore=0;
+		 contaAlfieriBianchi=0;
+		 contaAlfieriNeri=0;
+		 contaCavalliBianchi=0;
+		 contaCavalliNeri=0;
+		 contaPedoniBianchi=0;
+		 contaPedoniNeri=0;
+		 contaRegineBianche=0;
+		 contaRegineNere=0;
+		 contaTorriBianche=0;
+		 contaTorriNere=0;
+
+		function cliccato(i,j) {
+			
+			switch (document.getElementById("img"+i+j+"").className)
+			{
+				case "vuota":
+					vuota(i,j);
+					break;
+					
+				case "pedoneN":
+					pedoneNero(i,j);
+					break;
+				case "torreN":
+					torreNero(i,j);
+					break;
+				case "cavalloN":
+					cavalloNero(i,j);
+					break;
+				case "alfiereN":
+					alfiereNero(i,j);
+					break;
+				case "reginaN":
+					reginaNero(i,j);
+					break;
+				case "reN":
+					reNero(i,j);
+					break;
+				
+				case "pedoneB":
+					pedoneBianco(i,j);
+					break;
+				case "torreB":
+					torreBianco(i,j);
+					break;
+				case "cavalloB":
+					cavalloBianco(i,j);
+					break;
+				case "alfiereB":
+					alfiereBianco(i,j);
+					break;
+				case "reginaB":
+					reginaBianco(i,j);
+					break;
+				case "reB":
+					reBianco(i,j);
+					break;
+			}
+		}
+							
+			function secondo(){
+			var cosaRianimare="";
+			var pedinaRianimata="";
+			var condizionePossibile=0;
+			
+			//controllo se è stato mangiato un re
+			var a=document.getElementById("img"+vettore[1]+"").src;
+			var pos=a.lastIndexOf("/");
+			var srcRelativo=a.substring(pos+1);
+			if(srcRelativo=="re_n.png")
+				giocatoreVincitore=2;
+			else if(srcRelativo=="re_b.png")
+				giocatoreVincitore=1;
+			
+			if(srcRelativo=="pedone_n.png")
+				{
+					document.getElementById("pedoniNeri").innerHTML="<td class='mN' id='pedoniNeri'><img src='img/pedone_n.png'></td>";
+					contaPedoniNeri++;
+					document.getElementById("contaPedoniNeri").innerHTML="<td class='mN' id='contaPedoniNeri'>x"+contaPedoniNeri+"</td>";
+				}
+			else if(srcRelativo=="pedone_b.png")
+				{
+					document.getElementById("pedoniBianchi").innerHTML="<td class='mB' id='pedoniBianchi'><img src='img/pedone_b.png'></td>";
+					contaPedoniBianchi++;
+					document.getElementById("contaPedoniBianchi").innerHTML="<td class='mB' id='contaPedoniBianchi'>x"+contaPedoniBianchi+"</td>";
+				}
+			else if(srcRelativo=="torre_n.png")
+				{
+					document.getElementById("torriNere").innerHTML="<td class='mN' id='torriNere'><img src='img/torre_n.png'></td>";
+					contaTorriNere++;
+					document.getElementById("contaTorriNere").innerHTML="<td class='mN' id='contaTorriNere'>x"+contaTorriNere+"</td>";
+				}
+			else if(srcRelativo=="torre_b.png")
+				{
+					document.getElementById("torriBianche").innerHTML="<td class='mB' id='torriBianche'><img src='img/torre_b.png'></td>";
+					contaTorriBianche++;
+					document.getElementById("contaTorriBianche").innerHTML="<td class='mB' id='contaTorriBianche'>x"+contaTorriBianche+"</td>";
+				}
+			else if(srcRelativo=="cavallo_n.png")
+				{
+					document.getElementById("cavalliNeri").innerHTML="<td class='mN' id='cavalliNeri'><img src='img/cavallo_n.png'></td>";
+					contaCavalliNeri++;
+					document.getElementById("contaCavalliNeri").innerHTML="<td class='mN' id='contaCavalliNeri'>x"+contaCavalliNeri+"</td>";
+				}
+			else if(srcRelativo=="cavallo_b.png")
+				{
+					document.getElementById("cavalliBianchi").innerHTML="<td class='mB' id='cavalliBianchi'><img src='img/cavallo_b.png'></td>";
+					contaCavalliBianchi++;
+					document.getElementById("contaCavalliBianchi").innerHTML="<td class='mB' id='contaCavalliBianchi'>x"+contaCavalliBianchi+"</td>";
+				}
+			else if(srcRelativo=="alfiere_n.png")
+				{
+					document.getElementById("alfieriNeri").innerHTML="<td class='mN' id='alfieriNeri'><img src='img/alfiere_n.png'></td>";
+					contaAlfieriNeri++;
+					document.getElementById("contaAlfieriNeri").innerHTML="<td class='mN' id='contaAlfieriNeri'>x"+contaAlfieriNeri+"</td>";
+				}
+			else if(srcRelativo=="alfiere_b.png")
+				{
+					document.getElementById("alfieriBianchi").innerHTML="<td class='mB' id='alfieriBianchi'><img src='img/alfiere_b.png'></td>";
+					contaAlfieriBianchi++;
+					document.getElementById("contaAlfieriBianchi").innerHTML="<td class='mB' id='contaAlfieriBianchi'>x"+contaAlfieriBianchi+"</td>";
+				}
+			else if(srcRelativo=="regina_n.png")
+				{
+					document.getElementById("regineNere").innerHTML="<td class='mN' id='regineNere'><img src='img/regina_n.png'></td>";
+					contaRegineNere++;
+					document.getElementById("contaRegineNere").innerHTML="<td class='mN' id='contaRegineNere'>x"+contaRegineNere+"</td>";
+				}
+			else if(srcRelativo=="regina_b.png")
+				{
+					document.getElementById("regineBianche").innerHTML="<td class='mB' id='regineBianche'><img src='img/regina_b.png'></td>";
+					contaRegineBianche++;
+					document.getElementById("contaRegineBianche").innerHTML="<td class='mB' id='contaRegineBianche'>x"+contaRegineBianche+"</td>";
+				}
+			
+			imgPrimo=document.getElementById("img"+vettore[0]+"").src;
+			imgSecondo=document.getElementById("img"+vettore[1]+"").src;
+			document.getElementById("img"+vettore[1]+"").src=imgPrimo;
+			document.getElementById("img"+vettore[0]+"").src="img/vuota.png";
+			document.getElementById("img"+vettore[0]+"").className = "vuota";
+			
+			var a=document.getElementById("img"+vettore[1]+"").src;
+			var pos=a.lastIndexOf("/");
+			var srcRelativo=a.substring(pos+1);
+			
+			//rianimare quando il pedone arriva alla fine
+			if(vettore[1]=="11" || vettore[1]=="12" || vettore[1]=="13" || vettore[1]=="14" || vettore[1]=="15" || vettore[1]=="16" || vettore[1]=="17" || vettore[1]=="18")
+				condizionePossibile=1;
+			else if(vettore[1]=="81" || vettore[1]=="82" || vettore[1]=="83" || vettore[1]=="84" || vettore[1]=="85" || vettore[1]=="86" || vettore[1]=="87" || vettore[1]=="88")
+				condizionePossibile=2;
+			
+			if(condizionePossibile==1 && srcRelativo=="pedone_b.png")
+				{
+					var risposta= confirm("Vuoi sostituire il pedone con un'altra pedina?");
+					if(risposta==true)
+					{
+						var nonValido=0;
+						cosaRianimare=prompt("Scrivi qui cosa vuoi sostituire a questo pedone (in minuscolo il nome della pedina) :","");
+						if(cosaRianimare!="pedone" && cosaRianimare!="torre" && cosaRianimare!="cavallo" && cosaRianimare!="alfiere" && cosaRianimare!="regina")
+						{
+							alert("Hai scritto una pedina non valida!");
+							nonValido=1;
+						}
+						if(nonValido==0)
+						{
+							pedinaRianimata="img/"+cosaRianimare+"_b.png";
+							document.getElementById("img"+vettore[1]+"").src = pedinaRianimata;
+							pedinaRianimata=cosaRianimare+"B";
+							document.getElementById("img"+vettore[1]+"").className = pedinaRianimata;
+						}
+					}
+				}
+			else if(condizionePossibile==2 && srcRelativo=="pedone_n.png")
+				{
+					var risposta= confirm("Vuoi sostituire il pedone con un'altra pedina?");
+					if(risposta==true)
+					{
+						nonValido=0;
+						cosaRianimare=prompt("Scrivi qui cosa vuoi sostituire a questo pedone (in minuscolo il nome della pedina) :","");
+						if(cosaRianimare!="pedone" && cosaRianimare!="torre" && cosaRianimare!="cavallo" && cosaRianimare!="alfiere" && cosaRianimare!="regina")
+						{
+							alert("Hai scritto una pedina non valida!");
+							nonValido=1;
+						}
+						if(nonValido==0)
+						{
+							pedinaRianimata="img/"+cosaRianimare+"_n.png";
+							document.getElementById("img"+vettore[1]+"").src = pedinaRianimata;
+							pedinaRianimata=cosaRianimare+"N";
+							document.getElementById("img"+vettore[1]+"").className = pedinaRianimata;							
+						}
+					}
+				}
+			
+			if(vettore[0]=="11")
+				contaMossePerArroccoNeroSinistra++;
+			else if(vettore[0]=="18")
+				contaMossePerArroccoNeroDestra++;
+			else if(vettore[0]=="81")
+				contaMossePerArroccoBiancoSinistra++;
+			else if(vettore[0]=="88")
+				contaMossePerArroccoBiancoDestra++;
+			
+			for(var contatore=0;contatore<contaMosse;contatore++)
+			{
+				document.getElementById("td"+possibileMovimento[contatore]+"").style.backgroundColor=vettore[2];
+				possibileMovimento[contatore]="0";
+			}
+				
+			if(possibileMangiataDX!="0")
+			{
+				document.getElementById("td"+possibileMangiataDX+"").style.backgroundColor=vettore[2];
+				possibileMangiataDX="0";
+			}
+			if(possibileMangiataSX!="0")
+			{
+				document.getElementById("td"+possibileMangiataSX+"").style.backgroundColor=vettore[2];
+				possibileMangiataSX="0";
+			}
+			if(possibileMangiataSu!="0")
+			{
+				document.getElementById("td"+possibileMangiataSu+"").style.backgroundColor=vettore[2];
+				possibileMangiataSu="0";
+			}
+			if(possibileMangiataGiu!="0")
+			{
+				document.getElementById("td"+possibileMangiataGiu+"").style.backgroundColor=vettore[2];
+				possibileMangiataGiu="0";
+			}
+			if(possibileMangiataDX2!="0")
+			{
+				document.getElementById("td"+possibileMangiataDX2+"").style.backgroundColor=vettore[2];
+				possibileMangiataDX2="0";
+			}
+			if(possibileMangiataSX2!="0")
+			{
+				document.getElementById("td"+possibileMangiataSX2+"").style.backgroundColor=vettore[2];
+				possibileMangiataSX2="0";
+			}
+			if(possibileMangiataSu2!="0")
+			{
+				document.getElementById("td"+possibileMangiataSu2+"").style.backgroundColor=vettore[2];
+				possibileMangiataSu2="0";
+			}
+			if(possibileMangiataGiu2!="0")
+			{
+				document.getElementById("td"+possibileMangiataGiu2+"").style.backgroundColor=vettore[2];
+				possibileMangiataGiu2X="0";
+			}
+			
+			var a=document.getElementById("img"+vettore[1]+"").src;
+			var pos=a.lastIndexOf("/");
+			var srcRelativo=a.substring(pos+1);
+			
+			//se vettore[1] ha tale src... la sua classe diventa tale....
+			if(srcRelativo=="vuota.png")
+				document.getElementById("img"+vettore[1]+"").className = "vuota";
+			else if(srcRelativo=="pedone_b.png")
+				document.getElementById("img"+vettore[1]+"").className = "pedoneB";
+			else if(srcRelativo=="pedone_n.png")
+				document.getElementById("img"+vettore[1]+"").className = "pedoneN";
+			else if(srcRelativo=="torre_b.png")
+				document.getElementById("img"+vettore[1]+"").className = "torreB";
+			else if(srcRelativo=="torre_n.png")
+				document.getElementById("img"+vettore[1]+"").className = "torreN";
+			else if(srcRelativo=="cavallo_b.png")
+				document.getElementById("img"+vettore[1]+"").className = "cavalloB";
+			else if(srcRelativo=="cavallo_n.png")
+				document.getElementById("img"+vettore[1]+"").className = "cavalloN";
+			else if(srcRelativo=="alfiere_b.png")
+				document.getElementById("img"+vettore[1]+"").className = "alfiereB";
+			else if(srcRelativo=="alfiere_n.png")
+				document.getElementById("img"+vettore[1]+"").className = "alfiereN";
+			else if(srcRelativo=="re_b.png")
+			{
+				document.getElementById("img"+vettore[1]+"").className = "reB";
+				contaMossePerArroccoBiancoDestra++;
+				contaMossePerArroccoBiancoSinistra++;
+			}
+			else if(srcRelativo=="re_n.png")
+			{
+				document.getElementById("img"+vettore[1]+"").className = "reN";
+				contaMossePerArroccoNeroDestra++;
+				contaMossePerArroccoNeroSinistra++;
+			}
+			else if(srcRelativo=="regina_b.png")
+				document.getElementById("img"+vettore[1]+"").className = "reginaB";
+			else if(srcRelativo=="regina_n.png")
+				document.getElementById("img"+vettore[1]+"").className = "reginaN";
+			
+			vettore[0]="0";
+			vettore[1]="0";
+			contaMosse=0;
+			
+			if(giocatoreVincitore!=0)	//se c'è un vincitore
+				vittoria();
+			
+			trovaIRe();	//mi faccio restituire le posizioni dei re
+			controlloMossaReNero(iReNero,jReNero);	//controllo se il re nero è sotto scacco
+			if(mossaPossibileRe>0)
+				scaccoAlReNero();
+			else
+			{
+				controlloMossaReBianco(iReBianco,jReBianco);	//controllo se il re nero è sotto scacco
+				if(mossaPossibileRe>0)
+					scaccoAlReBianco();
+			}
+		}
+		
+		function mossaNonConsentita()
+		{
+			alert("Questa mossa non e' consentita!");
+			//ripulisco gli azzurri
+			for(var contatore=0;contatore<contaMosse;contatore++)
+			{
+				document.getElementById("td"+possibileMovimento[contatore]+"").style.backgroundColor=vettore[2];
+				possibileMovimento[contatore]="0";
+			}
+			//ripulisco i verdi
+			if(possibileMangiataDX!="0")
+			{
+				document.getElementById("td"+possibileMangiataDX+"").style.backgroundColor=vettore[2];
+				possibileMangiataDX="0";
+			}
+			if(possibileMangiataSX!="0")
+			{
+				document.getElementById("td"+possibileMangiataSX+"").style.backgroundColor=vettore[2];
+				possibileMangiataSX="0";
+			}
+			if(possibileMangiataSu!="0")
+			{
+				document.getElementById("td"+possibileMangiataSu+"").style.backgroundColor=vettore[2];
+				possibileMangiataSu="0";
+			}
+			if(possibileMangiataGiu!="0")
+			{
+				document.getElementById("td"+possibileMangiataGiu+"").style.backgroundColor=vettore[2];
+				possibileMangiataGiu="0";
+			}
+			if(possibileMangiataDX2!="0")
+			{
+				document.getElementById("td"+possibileMangiataDX2+"").style.backgroundColor=vettore[2];
+				possibileMangiataDX2="0";
+			}
+			if(possibileMangiataSX2!="0")
+			{
+				document.getElementById("td"+possibileMangiataSX2+"").style.backgroundColor=vettore[2];
+				possibileMangiataSX2="0";
+			}
+			if(possibileMangiataSu2!="0")
+			{
+				document.getElementById("td"+possibileMangiataSu2+"").style.backgroundColor=vettore[2];
+				possibileMangiataSu2="0";
+			}
+			if(possibileMangiataGiu2!="0")
+			{
+				document.getElementById("td"+possibileMangiataGiu2+"").style.backgroundColor=vettore[2];
+				possibileMangiataGiu2X="0";
+			}
+			
+			//ripulisco i gialli
+			if(document.getElementById("td12").style.backgroundColor=="yellow")
+				document.getElementById("td12").style.backgroundColor=vettore[2];
+			if(document.getElementById("td17").style.backgroundColor=="yellow")
+				document.getElementById("td17").style.backgroundColor=vettore[2];
+			if(document.getElementById("td82").style.backgroundColor=="yellow")
+				document.getElementById("td82").style.backgroundColor=vettore[2];
+			if(document.getElementById("td87").style.backgroundColor=="yellow")
+				document.getElementById("td87").style.backgroundColor=vettore[2];
+					
+			vettore[0]="0";
+			vettore[1]="0";
+			contaMosse=0;
+			
+			if(turno==0)
+				turno=1;
+			else
+				turno=0;
+		}
+		
+		function vittoria()
+		{
+			if(giocatoreVincitore==1)
+				alert("Ha vinto il nero!");
+			else
+				alert("Ha vinto il bianco!");
+				
+			vittoria = "<img src='img/vittoria.gif' style='width:100%;'></img>";
+			document.body.innerHTML = vittoria;
+			setTimeout(function() {	
+				window.location.href = "index.html";
+			}, 8000);
+		}
+		
+		function scaccoMatto()
+		{
+			alert("SCACCO MATTO!!!");
+		}
+		
+		function scaccoAlReNero()
+		{
+			alert("SCACCO AL RE NERO!");
+			casiPossibili=0;
+			casiFavorevoli=0;
+			
+			//controllo dello scacco matto
+			if(iReNero>=2 && jReNero>=2)
+				controlloMossaReNero((iReNero-1),(jReNero-1));	// 1 su 1 sx
+			
+			if(iReNero>=2)
+				controlloMossaReNero((iReNero-1),jReNero);	// 1 su
+			
+			if(iReNero>=2 && jReNero<=7)
+				controlloMossaReNero((iReNero-1),(jReNero+1));	// 1 su 1 dx
+			
+			if(jReNero<=7)
+				controlloMossaReNero(iReNero,(jReNero+1));	// 1 dx
+			
+			if(iReNero<=7 && jReNero<=7)
+				controlloMossaReNero((iReNero+1),(jReNero+1));	// 1 giu 1 dx
+			
+			if(iReNero<=7)
+				controlloMossaReNero((iReNero+1),jReNero);	// 1 giu
+			
+			if(iReNero<=7 && jReNero>=2)
+				controlloMossaReNero((iReNero+1),(jReNero-1));	// 1 giu 1 sx
+			
+			if(jReNero>=2)
+				controlloMossaReNero(iReNero,(jReNero-1));	// 1 sx			
+				
+			if(casiFavorevoli==casiPossibili)
+				scaccoMatto();
+		}
+		
+		function scaccoAlReBianco()
+		{
+			alert("SCACCO AL RE BIANCO!");
+			casiPossibili=0;
+			casiFavorevoli=0;
+			
+			//controllo dello scacco matto
+			if(iReBianco>=2 && jReBianco>=2)
+				controlloMossaReBianco((iReBianco-1),(jReBianco-1));	// 1 su 1 sx
+			
+			if(iReBianco>=2)
+				controlloMossaReBianco((iReBianco-1),jReBianco);	// 1 su
+			
+			if(iReBianco>=2 && jReBianco<=7)
+				controlloMossaReBianco((iReBianco-1),(jReBianco+1));	// 1 su 1 dx
+			
+			if(jReBianco<=7)
+				controlloMossaReBianco(iReBianco,(jReBianco+1));	// 1 dx
+			
+			if(iReBianco<=7 && jReBianco<=7)
+				controlloMossaReBianco((iReBianco+1),(jReBianco+1));	// 1 giu 1 dx
+			
+			if(iReBianco<=7)
+				controlloMossaReBianco((iReBianco+1),jReBianco);	// 1 giu
+			
+			if(iReBianco<=7 && jReBianco>=2)
+				controlloMossaReBianco((iReBianco+1),(jReBianco-1));	// 1 giu 1 sx
+			
+			if(jReBianco>=2)
+				controlloMossaReBianco(iReBianco,(jReBianco-1));	// 1 sx			
+				
+			if(casiFavorevoli==casiPossibili)
+				scaccoMatto();
+		}
+		
+		function trovaIRe()
+		{
+			for(var contatoreI=1;contatoreI<=8;contatoreI++)
+			{
+				for(var contatoreJ=1;contatoreJ<=8;contatoreJ++)
+				{
+					var a=document.getElementById("img"+contatoreI+contatoreJ+"").src;
+					var pos=a.lastIndexOf("/");
+					var srcRelativo=a.substring(pos+1);
+							
+					if(srcRelativo=="re_n.png")	//se c'è il re nero
+					{
+						iReNero=contatoreI;
+						jReNero=contatoreJ;
+						break;
+					}
+					
+					else if(srcRelativo=="re_b.png")	//se c'è il re bianco
+					{
+						iReBianco=contatoreI;
+						jReBianco=contatoreJ;
+						break;
+					}
+				}
+			}
+		}
+		
+		
+		
+		function vuota(i,j)
+		{
+			
+			if(vettore[0]=="0")	//mittente
+			{
+				alert("Seleziona un oggetto degli scacchi, non una casella vuota!");
+			}
+			else  //ricevente
+			{
+				
+				document.getElementById("td"+vettore[0]+"").style.backgroundColor=vettore[2];
+				vettore[1]=""+i+j+"";
+				
+				if(vettore[1]=="17" && arroccoNeroDestraPossibile==1)	//controllo arrocco a destra re nero
+				{
+					document.getElementById("td"+vettore[1]+"").style.backgroundColor=vettore[2];
+					document.getElementById("img17").src="img/re_n.png";
+					document.getElementById("img17").className = "reN";
+					document.getElementById("img16").src="img/torre_n.png";
+					document.getElementById("img16").className = "torreN";
+					document.getElementById("img18").src="img/vuota.png";
+					document.getElementById("img18").className = "vuota";
+					document.getElementById("img"+vettore[0]+"").src="img/vuota.png";
+					document.getElementById("img"+vettore[0]+"").className = "vuota";
+					ok=1;
+					arroccoNeroDestraPossibile=2;
+					//ripulisco i colori e le variabili
+						for(var contatore=0;contatore<contaMosse;contatore++)
+						{
+							document.getElementById("td"+possibileMovimento[contatore]+"").style.backgroundColor=vettore[2];
+							possibileMovimento[contatore]="0";
+						}							
+						if(possibileMangiataDX!="0")
+						{
+							document.getElementById("td"+possibileMangiataDX+"").style.backgroundColor=vettore[2];
+							possibileMangiataDX="0";
+						}
+						if(possibileMangiataSX!="0")
+						{
+							document.getElementById("td"+possibileMangiataSX+"").style.backgroundColor=vettore[2];
+							possibileMangiataSX="0";
+						}
+						if(possibileMangiataSu!="0")
+						{
+							document.getElementById("td"+possibileMangiataSu+"").style.backgroundColor=vettore[2];
+							possibileMangiataSu="0";
+						}
+						if(possibileMangiataGiu!="0")
+						{
+							document.getElementById("td"+possibileMangiataGiu+"").style.backgroundColor=vettore[2];
+							possibileMangiataGiu="0";
+						}
+						if(possibileMangiataDX2!="0")
+						{
+							document.getElementById("td"+possibileMangiataDX2+"").style.backgroundColor=vettore[2];
+							possibileMangiataDX2="0";
+						}
+						if(possibileMangiataSX2!="0")
+						{
+							document.getElementById("td"+possibileMangiataSX2+"").style.backgroundColor=vettore[2];
+							possibileMangiataSX2="0";
+						}
+						if(possibileMangiataSu2!="0")
+						{
+							document.getElementById("td"+possibileMangiataSu2+"").style.backgroundColor=vettore[2];
+							possibileMangiataSu2="0";
+						}
+						if(possibileMangiataGiu2!="0")
+						{
+							document.getElementById("td"+possibileMangiataGiu2+"").style.backgroundColor=vettore[2];
+							possibileMangiataGiu2X="0";
+						}
+						//ripulisco i gialli
+						if(document.getElementById("td12").style.backgroundColor=="yellow")
+							document.getElementById("td12").style.backgroundColor=vettore[2];
+						if(document.getElementById("td17").style.backgroundColor=="yellow")
+							document.getElementById("td17").style.backgroundColor=vettore[2];
+						if(document.getElementById("td82").style.backgroundColor=="yellow")
+							document.getElementById("td82").style.backgroundColor=vettore[2];
+						if(document.getElementById("td87").style.backgroundColor=="yellow")
+							document.getElementById("td87").style.backgroundColor=vettore[2];
+							
+						vettore[0]="0";
+						vettore[1]="0";
+						contaMosse=0;
+						contaMossePerArroccoNeroDestra++;
+						contaMossePerArroccoNeroSinistra++;						
+						trovaIRe();	//mi faccio restituire le posizioni dei re
+						controlloMossaReNero(iReNero,jReNero);	//controllo se il re nero è sotto scacco
+						if(mossaPossibileRe>0)
+							scaccoAlReNero();
+				}
+				
+				if(vettore[1]=="12" && arroccoNeroSinistraPossibile==1)	//controllo arrocco a sinistra re nero
+				{
+					document.getElementById("td"+vettore[1]+"").style.backgroundColor=vettore[2];
+					document.getElementById("img12").src="img/re_n.png";
+					document.getElementById("img12").className = "reN";
+					document.getElementById("img13").src="img/torre_n.png";
+					document.getElementById("img13").className = "torreN";
+					document.getElementById("img11").src="img/vuota.png";
+					document.getElementById("img11").className = "vuota";
+					document.getElementById("img"+vettore[0]+"").src="img/vuota.png";
+					document.getElementById("img"+vettore[0]+"").className = "vuota";
+					ok=1;
+					arroccoNeroSinistraPossibile=2;
+					//ripulisco i colori e le variabili
+						for(var contatore=0;contatore<contaMosse;contatore++)
+						{
+							document.getElementById("td"+possibileMovimento[contatore]+"").style.backgroundColor=vettore[2];
+							possibileMovimento[contatore]="0";
+						}							
+						if(possibileMangiataDX!="0")
+						{
+							document.getElementById("td"+possibileMangiataDX+"").style.backgroundColor=vettore[2];
+							possibileMangiataDX="0";
+						}
+						if(possibileMangiataSX!="0")
+						{
+							document.getElementById("td"+possibileMangiataSX+"").style.backgroundColor=vettore[2];
+							possibileMangiataSX="0";
+						}
+						if(possibileMangiataSu!="0")
+						{
+							document.getElementById("td"+possibileMangiataSu+"").style.backgroundColor=vettore[2];
+							possibileMangiataSu="0";
+						}
+						if(possibileMangiataGiu!="0")
+						{
+							document.getElementById("td"+possibileMangiataGiu+"").style.backgroundColor=vettore[2];
+							possibileMangiataGiu="0";
+						}
+						if(possibileMangiataDX2!="0")
+						{
+							document.getElementById("td"+possibileMangiataDX2+"").style.backgroundColor=vettore[2];
+							possibileMangiataDX2="0";
+						}
+						if(possibileMangiataSX2!="0")
+						{
+							document.getElementById("td"+possibileMangiataSX2+"").style.backgroundColor=vettore[2];
+							possibileMangiataSX2="0";
+						}
+						if(possibileMangiataSu2!="0")
+						{
+							document.getElementById("td"+possibileMangiataSu2+"").style.backgroundColor=vettore[2];
+							possibileMangiataSu2="0";
+						}
+						if(possibileMangiataGiu2!="0")
+						{
+							document.getElementById("td"+possibileMangiataGiu2+"").style.backgroundColor=vettore[2];
+							possibileMangiataGiu2X="0";
+						}				
+						//ripulisco i gialli
+						if(document.getElementById("td12").style.backgroundColor=="yellow")
+							document.getElementById("td12").style.backgroundColor=vettore[2];
+						if(document.getElementById("td17").style.backgroundColor=="yellow")
+							document.getElementById("td17").style.backgroundColor=vettore[2];
+						if(document.getElementById("td82").style.backgroundColor=="yellow")
+							document.getElementById("td82").style.backgroundColor=vettore[2];
+						if(document.getElementById("td87").style.backgroundColor=="yellow")
+							document.getElementById("td87").style.backgroundColor=vettore[2];
+							
+						vettore[0]="0";
+						vettore[1]="0";
+						contaMosse=0;
+						contaMossePerArroccoNeroDestra++;
+						contaMossePerArroccoNeroSinistra++;						
+						trovaIRe();	//mi faccio restituire le posizioni dei re
+						controlloMossaReNero(iReNero,jReNero);	//controllo se il re nero è sotto scacco
+						if(mossaPossibileRe>0)
+							scaccoAlReNero();
+				}
+				if(vettore[1]=="87" && arroccoBiancoDestraPossibile==1)	//controllo arrocco a destra re bianco
+				{
+					document.getElementById("td"+vettore[1]+"").style.backgroundColor=vettore[2];
+					document.getElementById("img87").src="img/re_b.png";
+					document.getElementById("img87").className = "reB";
+					document.getElementById("img86").src="img/torre_b.png";
+					document.getElementById("img86").className = "torreB";
+					document.getElementById("img88").src="img/vuota.png";
+					document.getElementById("img88").className = "vuota";
+					document.getElementById("img"+vettore[0]+"").src="img/vuota.png";
+					document.getElementById("img"+vettore[0]+"").className = "vuota";
+					ok=1;
+					arroccoBiancoDestraPossibile=2;
+					//ripulisco i colori e le variabili
+						for(var contatore=0;contatore<contaMosse;contatore++)
+						{
+							document.getElementById("td"+possibileMovimento[contatore]+"").style.backgroundColor=vettore[2];
+							possibileMovimento[contatore]="0";
+						}							
+						if(possibileMangiataDX!="0")
+						{
+							document.getElementById("td"+possibileMangiataDX+"").style.backgroundColor=vettore[2];
+							possibileMangiataDX="0";
+						}
+						if(possibileMangiataSX!="0")
+						{
+							document.getElementById("td"+possibileMangiataSX+"").style.backgroundColor=vettore[2];
+							possibileMangiataSX="0";
+						}
+						if(possibileMangiataSu!="0")
+						{
+							document.getElementById("td"+possibileMangiataSu+"").style.backgroundColor=vettore[2];
+							possibileMangiataSu="0";
+						}
+						if(possibileMangiataGiu!="0")
+						{
+							document.getElementById("td"+possibileMangiataGiu+"").style.backgroundColor=vettore[2];
+							possibileMangiataGiu="0";
+						}
+						if(possibileMangiataDX2!="0")
+						{
+							document.getElementById("td"+possibileMangiataDX2+"").style.backgroundColor=vettore[2];
+							possibileMangiataDX2="0";
+						}
+						if(possibileMangiataSX2!="0")
+						{
+							document.getElementById("td"+possibileMangiataSX2+"").style.backgroundColor=vettore[2];
+							possibileMangiataSX2="0";
+						}
+						if(possibileMangiataSu2!="0")
+						{
+							document.getElementById("td"+possibileMangiataSu2+"").style.backgroundColor=vettore[2];
+							possibileMangiataSu2="0";
+						}
+						if(possibileMangiataGiu2!="0")
+						{
+							document.getElementById("td"+possibileMangiataGiu2+"").style.backgroundColor=vettore[2];
+							possibileMangiataGiu2X="0";
+						}
+						//ripulisco i gialli
+						if(document.getElementById("td12").style.backgroundColor=="yellow")
+							document.getElementById("td12").style.backgroundColor=vettore[2];
+						if(document.getElementById("td17").style.backgroundColor=="yellow")
+							document.getElementById("td17").style.backgroundColor=vettore[2];
+						if(document.getElementById("td82").style.backgroundColor=="yellow")
+							document.getElementById("td82").style.backgroundColor=vettore[2];
+						if(document.getElementById("td87").style.backgroundColor=="yellow")
+							document.getElementById("td87").style.backgroundColor=vettore[2];
+							
+						vettore[0]="0";
+						vettore[1]="0";
+						contaMosse=0;
+						contaMossePerArroccoBiancoDestra++;
+						contaMossePerArroccoBiancoSinistra++;						
+						trovaIRe();	//mi faccio restituire le posizioni dei re
+						controlloMossaReBianco(iReBianco,jReBianco);	//controllo se il re nero è sotto scacco
+						if(mossaPossibileRe>0)
+							scaccoAlReBianco();
+				}
+				
+				if(vettore[1]=="82" && arroccoBiancoSinistraPossibile==1)	//controllo arrocco a sinistra re bianco
+				{
+					document.getElementById("td"+vettore[1]+"").style.backgroundColor=vettore[2];
+					document.getElementById("img82").src="img/re_b.png";
+					document.getElementById("img82").className = "reB";
+					document.getElementById("img83").src="img/torre_b.png";
+					document.getElementById("img83").className = "torreB";
+					document.getElementById("img81").src="img/vuota.png";
+					document.getElementById("img81").className = "vuota";
+					document.getElementById("img"+vettore[0]+"").src="img/vuota.png";
+					document.getElementById("img"+vettore[0]+"").className = "vuota";
+					ok=1;
+					arroccoBiancoSinistraPossibile=2;
+					//ripulisco i colori e le variabili
+						for(var contatore=0;contatore<contaMosse;contatore++)
+						{
+							document.getElementById("td"+possibileMovimento[contatore]+"").style.backgroundColor=vettore[2];
+							possibileMovimento[contatore]="0";
+						}							
+						if(possibileMangiataDX!="0")
+						{
+							document.getElementById("td"+possibileMangiataDX+"").style.backgroundColor=vettore[2];
+							possibileMangiataDX="0";
+						}
+						if(possibileMangiataSX!="0")
+						{
+							document.getElementById("td"+possibileMangiataSX+"").style.backgroundColor=vettore[2];
+							possibileMangiataSX="0";
+						}
+						if(possibileMangiataSu!="0")
+						{
+							document.getElementById("td"+possibileMangiataSu+"").style.backgroundColor=vettore[2];
+							possibileMangiataSu="0";
+						}
+						if(possibileMangiataGiu!="0")
+						{
+							document.getElementById("td"+possibileMangiataGiu+"").style.backgroundColor=vettore[2];
+							possibileMangiataGiu="0";
+						}
+						if(possibileMangiataDX2!="0")
+						{
+							document.getElementById("td"+possibileMangiataDX2+"").style.backgroundColor=vettore[2];
+							possibileMangiataDX2="0";
+						}
+						if(possibileMangiataSX2!="0")
+						{
+							document.getElementById("td"+possibileMangiataSX2+"").style.backgroundColor=vettore[2];
+							possibileMangiataSX2="0";
+						}
+						if(possibileMangiataSu2!="0")
+						{
+							document.getElementById("td"+possibileMangiataSu2+"").style.backgroundColor=vettore[2];
+							possibileMangiataSu2="0";
+						}
+						if(possibileMangiataGiu2!="0")
+						{
+							document.getElementById("td"+possibileMangiataGiu2+"").style.backgroundColor=vettore[2];
+							possibileMangiataGiu2X="0";
+						}				
+						//ripulisco i gialli
+						if(document.getElementById("td12").style.backgroundColor=="yellow")
+							document.getElementById("td12").style.backgroundColor=vettore[2];
+						if(document.getElementById("td17").style.backgroundColor=="yellow")
+							document.getElementById("td17").style.backgroundColor=vettore[2];
+						if(document.getElementById("td82").style.backgroundColor=="yellow")
+							document.getElementById("td82").style.backgroundColor=vettore[2];
+						if(document.getElementById("td87").style.backgroundColor=="yellow")
+							document.getElementById("td87").style.backgroundColor=vettore[2];
+							
+						vettore[0]="0";
+						vettore[1]="0";
+						contaMosse=0;
+						contaMossePerArroccoBiancoDestra++;
+						contaMossePerArroccoBiancoSinistra++;						
+						trovaIRe();	//mi faccio restituire le posizioni dei re
+						controlloMossaReBianco(iReBianco,jReBianco);	//controllo se il re nero è sotto scacco
+						if(mossaPossibileRe>0)
+							scaccoAlReBianco();
+				}
+				
+				for(var contatore=0;contatore<contaMosse;contatore++)
+				{
+					if(vettore[1]==possibileMovimento[contatore])
+					{
+						secondo();
+						ok=1;
+						break;
+					}
+				}
+					if(ok==0)
+					{
+						mossaNonConsentita();
+					}	
+				ok=0;
+			}
+		}
+		
+		
+		function pedoneNero(i,j)
+		{
+			if(vettore[0]=="0")	//primo oggetto selezionato : mittente
+			{
+				if(turno==0)  //se tocca al nero
+				{
+					vettore[0]=""+i+j+"";
+					vettore[2]=document.getElementById("td"+vettore[0]+"").style.backgroundColor;
+					document.getElementById("td"+vettore[0]+"").style.backgroundColor="red";
+					var controllaSecondo=0; //per evitare lo scavalcamento
+					
+					//possibili movimenti
+					
+						var a=document.getElementById("img"+(i+1)+j+"").src;
+						var pos=a.lastIndexOf("/");
+						var srcRelativo=a.substring(pos+1);
+							
+						if(srcRelativo=="vuota.png")	//se non c'e' un oggetto
+						{
+							possibileMovimento[contaMosse]=""+(i+1)+j+"";
+							contaMosse++;
+							controllaSecondo=1;
+						}
+					
+					if(i==2 && controllaSecondo==1)
+					{
+						var b=document.getElementById("img"+(i+2)+j+"").src;
+						var pos=b.lastIndexOf("/");
+						var srcRelativo=b.substring(pos+1);
+							
+						if(srcRelativo=="vuota.png")	//se non c'e' un oggetto
+						{
+							possibileMovimento[contaMosse]=""+(i+2)+j+"";
+							contaMosse++;
+						}					
+					}
+					
+					//possibili mangiate
+						//possibile mangiata a sinistra
+					if(j>1)
+					{
+						var a=document.getElementById("img"+(i+1)+(j-1)+"").src;
+						var pos=a.lastIndexOf("/");
+						var srcRelativo=a.substring(pos+1);
+							
+						if(srcRelativo=="alfiere_b.png" || srcRelativo=="cavallo_b.png" || srcRelativo=="pedone_b.png" || srcRelativo=="re_b.png" || srcRelativo=="regina_b.png" || srcRelativo=="torre_b.png")	//se c'e' un bianco
+						{
+							possibileMangiataSX=""+(i+1)+(j-1)+"";
+							document.getElementById("td"+possibileMangiataSX+"").style.backgroundColor="green";
+						}
+					}
+					
+						//possibile mangiata a destra
+					if(j<8)
+					{
+						var a=document.getElementById("img"+(i+1)+(j+1)+"").src;
+						var pos=a.lastIndexOf("/");
+						var srcRelativo=a.substring(pos+1);
+							
+						if(srcRelativo=="alfiere_b.png" || srcRelativo=="cavallo_b.png" || srcRelativo=="pedone_b.png" || srcRelativo=="re_b.png" || srcRelativo=="regina_b.png" || srcRelativo=="torre_b.png")	//se c'e' un bianco
+						{
+							possibileMangiataDX=""+(i+1)+(j+1)+"";
+							document.getElementById("td"+possibileMangiataDX+"").style.backgroundColor="green";
+						}
+					}
+					
+					for(var contatore=0;contatore<contaMosse;contatore++)
+						document.getElementById("td"+possibileMovimento[contatore]+"").style.backgroundColor="lightblue";
+					turno=1;
+					controllaSecondo=0;
+				}
+				else
+					alert("Tocca all'altro giocatore!");
+			}			
+			else //secondo oggetto selezionato : ricevente
+			{
+				document.getElementById("td"+vettore[0]+"").style.backgroundColor=vettore[2];
+				vettore[1]=""+i+j+"";
+								
+				//controllo movimento
+				for(var contatore=0;contatore<contaMosse;contatore++)
+				{
+					if(vettore[1]==possibileMovimento[contatore])
+					{
+						secondo();
+						break;
+					}
+				}
+				if(vettore[1]==possibileMangiataSX) //controllo mangiata SX
+					secondo();
+				else if (vettore[1]==possibileMangiataDX) //controllo mangiata DX
+					secondo();
+				else if (vettore[1]==possibileMangiataSu) //controllo mangiata Su
+					secondo();
+				else if (vettore[1]==possibileMangiataGiu) //controllo mangiata Giu
+					secondo();
+				else if(vettore[1]==possibileMangiataSX2) //controllo mangiata SX2(cavallo)
+					secondo();
+				else if (vettore[1]==possibileMangiataDX2) //controllo mangiata DX2(cavallo)
+					secondo();
+				else if (vettore[1]==possibileMangiataSu2) //controllo mangiata Su2(cavallo)
+					secondo();
+				else if (vettore[1]==possibileMangiataGiu2) //controllo mangiata Giu2(cavallo)
+					secondo();
+				else
+					mossaNonConsentita();
+			}
+		}
+		
+		
+		
+		function pedoneBianco(i,j)
+		{
+			if(vettore[0]=="0")	//primo oggetto selezionato : mittente
+			{
+				if(turno==1)
+				{
+					vettore[0]=""+i+j+"";
+					vettore[2]=document.getElementById("td"+vettore[0]+"").style.backgroundColor;
+					document.getElementById("td"+vettore[0]+"").style.backgroundColor="red";
+					
+					//possibili movimenti
+					
+						var a=document.getElementById("img"+(i-1)+j+"").src;
+						var pos=a.lastIndexOf("/");
+						var srcRelativo=a.substring(pos+1);
+							
+						if(srcRelativo=="vuota.png")	//se non c'e' un oggetto
+						{
+							possibileMovimento[contaMosse]=""+(i-1)+j+"";
+							contaMosse++;
+							controllaSecondo=1;
+						}
+					
+					if(i==7 && controllaSecondo==1)
+					{
+						var b=document.getElementById("img"+(i-2)+j+"").src;
+						var pos=b.lastIndexOf("/");
+						var srcRelativo=b.substring(pos+1);
+							
+						if(srcRelativo=="vuota.png")	//se non c'e' un oggetto
+						{
+							possibileMovimento[contaMosse]=""+(i-2)+j+"";
+							contaMosse++;
+						}					
+					}
+					
+					//possibili mangiate
+						//possibile mangiata a sinistra
+					if(j>1)
+					{
+						var a=document.getElementById("img"+(i-1)+(j-1)+"").src;
+						var pos=a.lastIndexOf("/");
+						var srcRelativo=a.substring(pos+1);
+							
+						if(srcRelativo=="alfiere_n.png" || srcRelativo=="cavallo_n.png" || srcRelativo=="pedone_n.png" || srcRelativo=="re_n.png" || srcRelativo=="regina_n.png" || srcRelativo=="torre_n.png")	//se c'e' un nero
+						{
+							possibileMangiataSX=""+(i-1)+(j-1)+"";
+							document.getElementById("td"+possibileMangiataSX+"").style.backgroundColor="green";
+						}
+					}
+					
+						//possibile mangiata a destra
+					if(j<8)
+					{
+						var a=document.getElementById("img"+(i-1)+(j+1)+"").src;
+						var pos=a.lastIndexOf("/");
+						var srcRelativo=a.substring(pos+1);
+							
+						if(srcRelativo=="alfiere_n.png" || srcRelativo=="cavallo_n.png" || srcRelativo=="pedone_n.png" || srcRelativo=="re_n.png" || srcRelativo=="regina_n.png" || srcRelativo=="torre_n.png")	//se c'e' un nero
+						{
+							possibileMangiataDX=""+(i-1)+(j+1)+"";
+							document.getElementById("td"+possibileMangiataDX+"").style.backgroundColor="green";
+						}
+					}
+					
+					for(var contatore=0;contatore<contaMosse;contatore++)
+						document.getElementById("td"+possibileMovimento[contatore]+"").style.backgroundColor="lightblue";
+					turno=0;
+					controllaSecondo=0;
+				}
+				else
+					alert("Tocca all'altro giocatore!");
+			}
+			
+			else //secondo oggetto selezionato : ricevente
+			{
+				document.getElementById("td"+vettore[0]+"").style.backgroundColor=vettore[2];
+				vettore[1]=""+i+j+"";
+				
+				//controllo movimento
+				for(var contatore=0;contatore<contaMosse;contatore++)
+				{
+					if(vettore[1]==possibileMovimento[contatore])
+					{
+						secondo();
+						break;
+					}
+				}
+				if(vettore[1]==possibileMangiataSX) //controllo mangiata SX
+					secondo();
+				else if (vettore[1]==possibileMangiataDX) //controllo mangiata DX
+					secondo();
+				else if (vettore[1]==possibileMangiataSu) //controllo mangiata Su
+					secondo();
+				else if (vettore[1]==possibileMangiataGiu) //controllo mangiata Giu
+					secondo();
+				else if(vettore[1]==possibileMangiataSX2) //controllo mangiata SX2(cavallo)
+					secondo();
+				else if (vettore[1]==possibileMangiataDX2) //controllo mangiata DX2(cavallo)
+					secondo();
+				else if (vettore[1]==possibileMangiataSu2) //controllo mangiata Su2(cavallo)
+					secondo();
+				else if (vettore[1]==possibileMangiataGiu2) //controllo mangiata Giu2(cavallo)
+					secondo();
+				else
+					mossaNonConsentita();
+			}
+		}
+		
+		
+		function torreNero(i,j)
+		{
+			if(vettore[0]=="0")	//primo oggetto selezionato : mittente
+			{
+				if(turno==0)
+				{
+					vettore[0]=""+i+j+"";
+					vettore[2]=document.getElementById("td"+vettore[0]+"").style.backgroundColor;
+					document.getElementById("td"+vettore[0]+"").style.backgroundColor="red";
+					
+					//possibili movimenti
+					var controllo=0;	//per controllare i vari movimenti possibili della torre
+					var iIniziale=i;
+					var jIniziale=j;
+					
+					//movimento in su
+					do{
+						if(i>=2)
+						{
+							var a=document.getElementById("img"+(i-1)+j+"").src;
+							var pos=a.lastIndexOf("/");
+							var srcRelativo=a.substring(pos+1);
+								
+							if(srcRelativo=="vuota.png")	//se non c'e' un oggetto
+							{
+								possibileMovimento[contaMosse]=""+(i-1)+j+"";
+								contaMosse++;
+								controllo=1;
+								i--;
+							}
+							else if(srcRelativo=="alfiere_b.png" || srcRelativo=="cavallo_b.png" || srcRelativo=="pedone_b.png" || srcRelativo=="re_b.png" || srcRelativo=="regina_b.png" || srcRelativo=="torre_b.png")	//se c'e' un bianco
+							{
+								possibileMangiataSu=""+(i-1)+j+"";
+								document.getElementById("td"+possibileMangiataSu+"").style.backgroundColor="green";
+								controllo=0;
+							}
+							else
+								controllo=0;
+						}
+						else
+							controllo=0;
+					}while(controllo==1);
+					
+					i=iIniziale;
+					
+					//movimento in giu
+					do{
+						if(i<=7)
+						{
+							var a=document.getElementById("img"+(i+1)+j+"").src;
+							var pos=a.lastIndexOf("/");
+							var srcRelativo=a.substring(pos+1);
+								
+							if(srcRelativo=="vuota.png")	//se non c'e' un oggetto
+							{
+								possibileMovimento[contaMosse]=""+(i+1)+j+"";
+								contaMosse++;
+								controllo=1;
+								i++;
+							}
+							else if(srcRelativo=="alfiere_b.png" || srcRelativo=="cavallo_b.png" || srcRelativo=="pedone_b.png" || srcRelativo=="re_b.png" || srcRelativo=="regina_b.png" || srcRelativo=="torre_b.png")	//se c'e' un bianco
+							{
+								possibileMangiataGiu=""+(i+1)+j+"";
+								document.getElementById("td"+possibileMangiataGiu+"").style.backgroundColor="green";
+								controllo=0;
+							}
+							else
+								controllo=0;
+						}
+						else
+							controllo=0;
+					}while(controllo==1);
+					
+					i=iIniziale;
+					
+					//movimento a sinistra
+					do{
+						if(j>=2)
+						{
+							var a=document.getElementById("img"+i+(j-1)+"").src;
+							var pos=a.lastIndexOf("/");
+							var srcRelativo=a.substring(pos+1);
+								
+							if(srcRelativo=="vuota.png")	//se non c'e' un oggetto
+							{
+								possibileMovimento[contaMosse]=""+i+(j-1)+"";
+								contaMosse++;
+								controllo=1;
+								j--;
+							}
+							else if(srcRelativo=="alfiere_b.png" || srcRelativo=="cavallo_b.png" || srcRelativo=="pedone_b.png" || srcRelativo=="re_b.png" || srcRelativo=="regina_b.png" || srcRelativo=="torre_b.png")	//se c'e' un bianco
+							{
+								possibileMangiataSX=""+i+(j-1)+"";
+								document.getElementById("td"+possibileMangiataSX+"").style.backgroundColor="green";
+								controllo=0;
+							}
+							else
+								controllo=0;
+						}
+						else
+							controllo=0;				
+					}while(controllo==1);
+					
+					j=jIniziale;
+					
+					//movimento a destra
+					do{
+						if(j<=7)
+						{
+							var a=document.getElementById("img"+i+(j+1)+"").src;
+							var pos=a.lastIndexOf("/");
+							var srcRelativo=a.substring(pos+1);
+								
+							if(srcRelativo=="vuota.png")	//se non c'e' un oggetto
+							{
+								possibileMovimento[contaMosse]=""+i+(j+1)+"";
+								contaMosse++;
+								controllo=1;
+								j++;
+							}
+							else if(srcRelativo=="alfiere_b.png" || srcRelativo=="cavallo_b.png" || srcRelativo=="pedone_b.png" || srcRelativo=="re_b.png" || srcRelativo=="regina_b.png" || srcRelativo=="torre_b.png")	//se c'e' un bianco
+							{
+								possibileMangiataDX=""+i+(j+1)+"";
+								document.getElementById("td"+possibileMangiataDX+"").style.backgroundColor="green";
+								controllo=0;
+							}
+							else
+								controllo=0;
+						}
+						else
+							controllo=0;				
+					}while(controllo==1);
+					
+					j=jIniziale;
+					
+					for(var contatore=0;contatore<contaMosse;contatore++)
+						document.getElementById("td"+possibileMovimento[contatore]+"").style.backgroundColor="lightblue";
+					turno=1;
+				}
+				else
+					alert("Tocca all'altro giocatore!");
+			}
+			
+			else //secondo oggetto selezionato : ricevente
+			{
+				document.getElementById("td"+vettore[0]+"").style.backgroundColor=vettore[2];
+				vettore[1]=""+i+j+"";
+				
+				//controllo movimento
+				for(var contatore=0;contatore<contaMosse;contatore++)
+				{
+					if(vettore[1]==possibileMovimento[contatore])
+					{
+						secondo();
+						break;
+					}
+				}
+				if(vettore[1]==possibileMangiataSX) //controllo mangiata SX
+					secondo();
+				else if (vettore[1]==possibileMangiataDX) //controllo mangiata DX
+					secondo();
+				else if (vettore[1]==possibileMangiataSu) //controllo mangiata Su
+					secondo();
+				else if (vettore[1]==possibileMangiataGiu) //controllo mangiata Giu
+					secondo();
+				else if(vettore[1]==possibileMangiataSX2) //controllo mangiata SX2(cavallo)
+					secondo();
+				else if (vettore[1]==possibileMangiataDX2) //controllo mangiata DX2(cavallo)
+					secondo();
+				else if (vettore[1]==possibileMangiataSu2) //controllo mangiata Su2(cavallo)
+					secondo();
+				else if (vettore[1]==possibileMangiataGiu2) //controllo mangiata Giu2(cavallo)
+					secondo();
+				else
+					mossaNonConsentita();
+			}
+		}
+		
+		function torreBianco(i,j)
+		{
+			if(vettore[0]=="0")	//primo oggetto selezionato : mittente
+			{
+				if(turno==1)
+				{
+					vettore[0]=""+i+j+"";
+					vettore[2]=document.getElementById("td"+vettore[0]+"").style.backgroundColor;
+					document.getElementById("td"+vettore[0]+"").style.backgroundColor="red";
+					
+					//possibili movimenti
+					var controllo=0;	//per controllare i vari movimenti possibili della torre
+					var iIniziale=i;
+					var jIniziale=j;
+					
+					//movimento in su
+					do{
+						if(i>=2)
+						{
+							var a=document.getElementById("img"+(i-1)+j+"").src;
+							var pos=a.lastIndexOf("/");
+							var srcRelativo=a.substring(pos+1);
+								
+							if(srcRelativo=="vuota.png")	//se non c'e' un oggetto
+							{
+								possibileMovimento[contaMosse]=""+(i-1)+j+"";
+								contaMosse++;
+								controllo=1;
+								i--;
+							}
+							else if(srcRelativo=="alfiere_n.png" || srcRelativo=="cavallo_n.png" || srcRelativo=="pedone_n.png" || srcRelativo=="re_n.png" || srcRelativo=="regina_n.png" || srcRelativo=="torre_n.png")	//se c'e' un nero
+							{
+								possibileMangiataSu=""+(i-1)+j+"";
+								document.getElementById("td"+possibileMangiataSu+"").style.backgroundColor="green";
+								controllo=0;
+							}
+							else
+								controllo=0;
+						}
+						else
+							controllo=0;
+					}while(controllo==1);
+					
+					i=iIniziale;
+					
+					//movimento in giu
+					do{
+						if(i<=7)
+						{
+							var a=document.getElementById("img"+(i+1)+j+"").src;
+							var pos=a.lastIndexOf("/");
+							var srcRelativo=a.substring(pos+1);
+								
+							if(srcRelativo=="vuota.png")	//se non c'e' un oggetto
+							{
+								possibileMovimento[contaMosse]=""+(i+1)+j+"";
+								contaMosse++;
+								controllo=1;
+								i++;
+							}
+							else if(srcRelativo=="alfiere_n.png" || srcRelativo=="cavallo_n.png" || srcRelativo=="pedone_n.png" || srcRelativo=="re_n.png" || srcRelativo=="regina_n.png" || srcRelativo=="torre_n.png")	//se c'e' un bianco
+							{
+								possibileMangiataGiu=""+(i+1)+j+"";
+								document.getElementById("td"+possibileMangiataGiu+"").style.backgroundColor="green";
+								controllo=0;
+							}
+							else
+								controllo=0;
+						}
+						else
+							controllo=0;
+					}while(controllo==1);
+					
+					i=iIniziale;
+					
+					//movimento a sinistra
+					do{
+						if(j>=2)
+						{
+							var a=document.getElementById("img"+i+(j-1)+"").src;
+							var pos=a.lastIndexOf("/");
+							var srcRelativo=a.substring(pos+1);
+								
+							if(srcRelativo=="vuota.png")	//se non c'e' un oggetto
+							{
+								possibileMovimento[contaMosse]=""+i+(j-1)+"";
+								contaMosse++;
+								controllo=1;
+								j--;
+							}
+							else if(srcRelativo=="alfiere_n.png" || srcRelativo=="cavallo_n.png" || srcRelativo=="pedone_n.png" || srcRelativo=="re_n.png" || srcRelativo=="regina_n.png" || srcRelativo=="torre_n.png")	//se c'e' un bianco
+							{
+								possibileMangiataSX=""+i+(j-1)+"";
+								document.getElementById("td"+possibileMangiataSX+"").style.backgroundColor="green";
+								controllo=0;
+							}
+							else
+								controllo=0;
+						}
+						else
+							controllo=0;				
+					}while(controllo==1);
+					
+					j=jIniziale;
+					
+					//movimento a destra
+					do{
+						if(j<=7)
+						{
+							var a=document.getElementById("img"+i+(j+1)+"").src;
+							var pos=a.lastIndexOf("/");
+							var srcRelativo=a.substring(pos+1);
+								
+							if(srcRelativo=="vuota.png")	//se non c'e' un oggetto
+							{
+								possibileMovimento[contaMosse]=""+i+(j+1)+"";
+								contaMosse++;
+								controllo=1;
+								j++;
+							}
+							else if(srcRelativo=="alfiere_n.png" || srcRelativo=="cavallo_n.png" || srcRelativo=="pedone_n.png" || srcRelativo=="re_n.png" || srcRelativo=="regina_n.png" || srcRelativo=="torre_n.png")	//se c'e' un bianco
+							{
+								possibileMangiataDX=""+i+(j+1)+"";
+								document.getElementById("td"+possibileMangiataDX+"").style.backgroundColor="green";
+								controllo=0;
+							}
+							else
+								controllo=0;
+						}
+						else
+							controllo=0;				
+					}while(controllo==1);
+					
+					j=jIniziale;
+					
+					for(var contatore=0;contatore<contaMosse;contatore++)
+						document.getElementById("td"+possibileMovimento[contatore]+"").style.backgroundColor="lightblue";
+					turno=0;
+				}
+				else
+					alert("Tocca all'altro giocatore!");
+			}
+			
+			else //secondo oggetto selezionato : ricevente
+			{
+				document.getElementById("td"+vettore[0]+"").style.backgroundColor=vettore[2];
+				vettore[1]=""+i+j+"";
+				
+				//controllo movimento
+				for(var contatore=0;contatore<contaMosse;contatore++)
+				{
+					if(vettore[1]==possibileMovimento[contatore])
+					{
+						secondo();
+						break;
+					}
+				}
+				if(vettore[1]==possibileMangiataSX) //controllo mangiata SX
+					secondo();
+				else if (vettore[1]==possibileMangiataDX) //controllo mangiata DX
+					secondo();
+				else if (vettore[1]==possibileMangiataSu) //controllo mangiata Su
+					secondo();
+				else if (vettore[1]==possibileMangiataGiu) //controllo mangiata Giu
+					secondo();
+				else if(vettore[1]==possibileMangiataSX2) //controllo mangiata SX2(cavallo)
+					secondo();
+				else if (vettore[1]==possibileMangiataDX2) //controllo mangiata DX2(cavallo)
+					secondo();
+				else if (vettore[1]==possibileMangiataSu2) //controllo mangiata Su2(cavallo)
+					secondo();
+				else if (vettore[1]==possibileMangiataGiu2) //controllo mangiata Giu2(cavallo)
+					secondo();
+				else
+					mossaNonConsentita();
+			}
+		}
+		
+		
+		function alfiereNero(i,j)
+		{
+			if(vettore[0]=="0")	//primo oggetto selezionato : mittente
+			{
+				if(turno==0)
+				{
+					vettore[0]=""+i+j+"";
+					vettore[2]=document.getElementById("td"+vettore[0]+"").style.backgroundColor;
+					document.getElementById("td"+vettore[0]+"").style.backgroundColor="red";
+					
+					//possibili movimenti
+					var controllo=0;	//per controllare i vari movimenti possibili della torre
+					var iIniziale=i;
+					var jIniziale=j;
+					
+					//movimento in su a sinistra
+					do{
+						if(i>=2 && j>=2)
+						{
+							var a=document.getElementById("img"+(i-1)+(j-1)+"").src;
+							var pos=a.lastIndexOf("/");
+							var srcRelativo=a.substring(pos+1);
+								
+							if(srcRelativo=="vuota.png")	//se non c'e' un oggetto
+							{
+								possibileMovimento[contaMosse]=""+(i-1)+(j-1)+"";
+								contaMosse++;
+								controllo=1;
+								i--;
+								j--;
+							}
+							else if(srcRelativo=="alfiere_b.png" || srcRelativo=="cavallo_b.png" || srcRelativo=="pedone_b.png" || srcRelativo=="re_b.png" || srcRelativo=="regina_b.png" || srcRelativo=="torre_b.png")	//se c'e' un bianco
+							{
+								possibileMangiataSu=""+(i-1)+(j-1)+"";
+								document.getElementById("td"+possibileMangiataSu+"").style.backgroundColor="green";
+								controllo=0;
+							}
+							else
+								controllo=0;
+						}
+						else
+							controllo=0;
+					}while(controllo==1);
+					
+					i=iIniziale;
+					j=jIniziale;
+					
+					//movimento in giu a destra
+					do{
+						if(i<=7 && j<=7)
+						{
+							var a=document.getElementById("img"+(i+1)+(j+1)+"").src;
+							var pos=a.lastIndexOf("/");
+							var srcRelativo=a.substring(pos+1);
+								
+							if(srcRelativo=="vuota.png")	//se non c'e' un oggetto
+							{
+								possibileMovimento[contaMosse]=""+(i+1)+(j+1)+"";
+								contaMosse++;
+								controllo=1;
+								i++;
+								j++;
+							}
+							else if(srcRelativo=="alfiere_b.png" || srcRelativo=="cavallo_b.png" || srcRelativo=="pedone_b.png" || srcRelativo=="re_b.png" || srcRelativo=="regina_b.png" || srcRelativo=="torre_b.png")	//se c'e' un bianco
+							{
+								possibileMangiataGiu=""+(i+1)+(j+1)+"";
+								document.getElementById("td"+possibileMangiataGiu+"").style.backgroundColor="green";
+								controllo=0;
+							}
+							else
+								controllo=0;
+						}
+						else
+							controllo=0;
+					}while(controllo==1);
+					
+					i=iIniziale;
+					j=jIniziale;
+					
+					//movimento in giu a sinistra
+					do{
+						if(i<=7 && j>=2)
+						{
+							var a=document.getElementById("img"+(i+1)+(j-1)+"").src;
+							var pos=a.lastIndexOf("/");
+							var srcRelativo=a.substring(pos+1);
+								
+							if(srcRelativo=="vuota.png")	//se non c'e' un oggetto
+							{
+								possibileMovimento[contaMosse]=""+(i+1)+(j-1)+"";
+								contaMosse++;
+								controllo=1;
+								i++;
+								j--;
+							}
+							else if(srcRelativo=="alfiere_b.png" || srcRelativo=="cavallo_b.png" || srcRelativo=="pedone_b.png" || srcRelativo=="re_b.png" || srcRelativo=="regina_b.png" || srcRelativo=="torre_b.png")	//se c'e' un bianco
+							{
+								possibileMangiataSX=""+(i+1)+(j-1)+"";
+								document.getElementById("td"+possibileMangiataSX+"").style.backgroundColor="green";
+								controllo=0;
+							}
+							else
+								controllo=0;
+						}
+						else
+							controllo=0;				
+					}while(controllo==1);
+					
+					i=iIniziale;
+					j=jIniziale;
+					
+					//movimento su a destra
+					do{
+						if(i>=2 && j<=7)
+						{
+							var a=document.getElementById("img"+(i-1)+(j+1)+"").src;
+							var pos=a.lastIndexOf("/");
+							var srcRelativo=a.substring(pos+1);
+								
+							if(srcRelativo=="vuota.png")	//se non c'e' un oggetto
+							{
+								possibileMovimento[contaMosse]=""+(i-1)+(j+1)+"";
+								contaMosse++;
+								controllo=1;
+								i--;
+								j++;
+							}
+							else if(srcRelativo=="alfiere_b.png" || srcRelativo=="cavallo_b.png" || srcRelativo=="pedone_b.png" || srcRelativo=="re_b.png" || srcRelativo=="regina_b.png" || srcRelativo=="torre_b.png")	//se c'e' un bianco
+							{
+								possibileMangiataDX=""+(i-1)+(j+1)+"";
+								document.getElementById("td"+possibileMangiataDX+"").style.backgroundColor="green";
+								controllo=0;
+							}
+							else
+								controllo=0;
+						}
+						else
+							controllo=0;				
+					}while(controllo==1);
+					
+					i=iIniziale;
+					j=jIniziale;
+					
+					for(var contatore=0;contatore<contaMosse;contatore++)
+						document.getElementById("td"+possibileMovimento[contatore]+"").style.backgroundColor="lightblue";
+					turno=1;
+				}
+				else
+					alert("Tocca all'altro giocatore!");
+			}
+			
+			else //secondo oggetto selezionato : ricevente
+			{
+				document.getElementById("td"+vettore[0]+"").style.backgroundColor=vettore[2];
+				vettore[1]=""+i+j+"";
+				
+				//controllo movimento
+				for(var contatore=0;contatore<contaMosse;contatore++)
+				{
+					if(vettore[1]==possibileMovimento[contatore])
+					{
+						secondo();
+						break;
+					}
+				}
+				if(vettore[1]==possibileMangiataSX) //controllo mangiata SX
+					secondo();
+				else if (vettore[1]==possibileMangiataDX) //controllo mangiata DX
+					secondo();
+				else if (vettore[1]==possibileMangiataSu) //controllo mangiata Su
+					secondo();
+				else if (vettore[1]==possibileMangiataGiu) //controllo mangiata Giu
+					secondo();
+				else if(vettore[1]==possibileMangiataSX2) //controllo mangiata SX2(cavallo)
+					secondo();
+				else if (vettore[1]==possibileMangiataDX2) //controllo mangiata DX2(cavallo)
+					secondo();
+				else if (vettore[1]==possibileMangiataSu2) //controllo mangiata Su2(cavallo)
+					secondo();
+				else if (vettore[1]==possibileMangiataGiu2) //controllo mangiata Giu2(cavallo)
+					secondo();
+				else
+					mossaNonConsentita();
+			}
+		}
+		
+		
+		function alfiereBianco(i,j)
+		{
+			if(vettore[0]=="0")	//primo oggetto selezionato : mittente
+			{
+				if(turno==1)
+				{
+					vettore[0]=""+i+j+"";
+					vettore[2]=document.getElementById("td"+vettore[0]+"").style.backgroundColor;
+					document.getElementById("td"+vettore[0]+"").style.backgroundColor="red";
+					
+					//possibili movimenti
+					var controllo=0;	//per controllare i vari movimenti possibili della torre
+					var iIniziale=i;
+					var jIniziale=j;
+					
+					//movimento in su a sinistra
+					do{
+						if(i>=2 && j>=2)
+						{
+							var a=document.getElementById("img"+(i-1)+(j-1)+"").src;
+							var pos=a.lastIndexOf("/");
+							var srcRelativo=a.substring(pos+1);
+								
+							if(srcRelativo=="vuota.png")	//se non c'e' un oggetto
+							{
+								possibileMovimento[contaMosse]=""+(i-1)+(j-1)+"";
+								contaMosse++;
+								controllo=1;
+								i--;
+								j--;
+							}
+							else if(srcRelativo=="alfiere_n.png" || srcRelativo=="cavallo_n.png" || srcRelativo=="pedone_n.png" || srcRelativo=="re_n.png" || srcRelativo=="regina_n.png" || srcRelativo=="torre_n.png")	//se c'e' un bianco
+							{
+								possibileMangiataSu=""+(i-1)+(j-1)+"";
+								document.getElementById("td"+possibileMangiataSu+"").style.backgroundColor="green";
+								controllo=0;
+							}
+							else
+								controllo=0;
+						}
+						else
+							controllo=0;
+					}while(controllo==1);
+					
+					i=iIniziale;
+					j=jIniziale;
+					
+					//movimento in giu a destra
+					do{
+						if(i<=7 && j<=7)
+						{
+							var a=document.getElementById("img"+(i+1)+(j+1)+"").src;
+							var pos=a.lastIndexOf("/");
+							var srcRelativo=a.substring(pos+1);
+								
+							if(srcRelativo=="vuota.png")	//se non c'e' un oggetto
+							{
+								possibileMovimento[contaMosse]=""+(i+1)+(j+1)+"";
+								contaMosse++;
+								controllo=1;
+								i++;
+								j++;
+							}
+							else if(srcRelativo=="alfiere_n.png" || srcRelativo=="cavallo_n.png" || srcRelativo=="pedone_n.png" || srcRelativo=="re_n.png" || srcRelativo=="regina_n.png" || srcRelativo=="torre_n.png")	//se c'e' un bianco
+							{
+								possibileMangiataGiu=""+(i+1)+(j+1)+"";
+								document.getElementById("td"+possibileMangiataGiu+"").style.backgroundColor="green";
+								controllo=0;
+							}
+							else
+								controllo=0;
+						}
+						else
+							controllo=0;
+					}while(controllo==1);
+					
+					i=iIniziale;
+					j=jIniziale;
+					
+					//movimento in giu a sinistra
+					do{
+						if(i<=7 && j>=2)
+						{
+							var a=document.getElementById("img"+(i+1)+(j-1)+"").src;
+							var pos=a.lastIndexOf("/");
+							var srcRelativo=a.substring(pos+1);
+								
+							if(srcRelativo=="vuota.png")	//se non c'e' un oggetto
+							{
+								possibileMovimento[contaMosse]=""+(i+1)+(j-1)+"";
+								contaMosse++;
+								controllo=1;
+								i++;
+								j--;
+							}
+							else if(srcRelativo=="alfiere_n.png" || srcRelativo=="cavallo_n.png" || srcRelativo=="pedone_n.png" || srcRelativo=="re_n.png" || srcRelativo=="regina_n.png" || srcRelativo=="torre_n.png")	//se c'e' un bianco
+							{
+								possibileMangiataSX=""+(i+1)+(j-1)+"";
+								document.getElementById("td"+possibileMangiataSX+"").style.backgroundColor="green";
+								controllo=0;
+							}
+							else
+								controllo=0;
+						}
+						else
+							controllo=0;				
+					}while(controllo==1);
+					
+					i=iIniziale;
+					j=jIniziale;
+					
+					//movimento su a destra
+					do{
+						if(i>=2 && j<=7)
+						{
+							var a=document.getElementById("img"+(i-1)+(j+1)+"").src;
+							var pos=a.lastIndexOf("/");
+							var srcRelativo=a.substring(pos+1);
+								
+							if(srcRelativo=="vuota.png")	//se non c'e' un oggetto
+							{
+								possibileMovimento[contaMosse]=""+(i-1)+(j+1)+"";
+								contaMosse++;
+								controllo=1;
+								i--;
+								j++;
+							}
+							else if(srcRelativo=="alfiere_n.png" || srcRelativo=="cavallo_n.png" || srcRelativo=="pedone_n.png" || srcRelativo=="re_n.png" || srcRelativo=="regina_n.png" || srcRelativo=="torre_n.png")	//se c'e' un bianco
+							{
+								possibileMangiataDX=""+(i-1)+(j+1)+"";
+								document.getElementById("td"+possibileMangiataDX+"").style.backgroundColor="green";
+								controllo=0;
+							}
+							else
+								controllo=0;
+						}
+						else
+							controllo=0;				
+					}while(controllo==1);
+					
+					i=iIniziale;
+					j=jIniziale;
+					
+					for(var contatore=0;contatore<contaMosse;contatore++)
+						document.getElementById("td"+possibileMovimento[contatore]+"").style.backgroundColor="lightblue";
+					turno=0;
+				}
+				else
+					alert("Tocca all'altro giocatore!");
+			}
+			
+			else //secondo oggetto selezionato : ricevente
+			{
+				document.getElementById("td"+vettore[0]+"").style.backgroundColor=vettore[2];
+				vettore[1]=""+i+j+"";
+				
+				//controllo movimento
+				for(var contatore=0;contatore<contaMosse;contatore++)
+				{
+					if(vettore[1]==possibileMovimento[contatore])
+					{
+						secondo();
+						break;
+					}
+				}
+				if(vettore[1]==possibileMangiataSX) //controllo mangiata SX
+					secondo();
+				else if (vettore[1]==possibileMangiataDX) //controllo mangiata DX
+					secondo();
+				else if (vettore[1]==possibileMangiataSu) //controllo mangiata Su
+					secondo();
+				else if (vettore[1]==possibileMangiataGiu) //controllo mangiata Giu
+					secondo();
+				else if(vettore[1]==possibileMangiataSX2) //controllo mangiata SX2(cavallo)
+					secondo();
+				else if (vettore[1]==possibileMangiataDX2) //controllo mangiata DX2(cavallo)
+					secondo();
+				else if (vettore[1]==possibileMangiataSu2) //controllo mangiata Su2(cavallo)
+					secondo();
+				else if (vettore[1]==possibileMangiataGiu2) //controllo mangiata Giu2(cavallo)
+					secondo();
+				else
+					mossaNonConsentita();
+			}
+		}
+
+		
+		function cavalloNero(i,j)
+		{
+			if(vettore[0]=="0")	//primo oggetto selezionato : mittente
+			{
+				if(turno==0)
+				{
+					vettore[0]=""+i+j+"";
+					vettore[2]=document.getElementById("td"+vettore[0]+"").style.backgroundColor;
+					document.getElementById("td"+vettore[0]+"").style.backgroundColor="red";
+					
+					//possibili movimenti
+						//movimento a L 2 in su e 1 a sx
+						if(i>=3 && j>=2)
+						{
+							var a=document.getElementById("img"+(i-2)+(j-1)+"").src;
+							var pos=a.lastIndexOf("/");
+							var srcRelativo=a.substring(pos+1);
+								
+							if(srcRelativo=="vuota.png")	//se non c'e' un oggetto
+							{
+								possibileMovimento[contaMosse]=""+(i-2)+(j-1)+"";
+								contaMosse++;
+							}
+							else if(srcRelativo=="alfiere_b.png" || srcRelativo=="cavallo_b.png" || srcRelativo=="pedone_b.png" || srcRelativo=="re_b.png" || srcRelativo=="regina_b.png" || srcRelativo=="torre_b.png")	//se c'e' un bianco
+							{
+								possibileMangiataSu=""+(i-2)+(j-1)+"";
+								document.getElementById("td"+possibileMangiataSu+"").style.backgroundColor="green";
+							}
+						}
+						
+						//movimento a L 2 in su e 1 a dx
+						if(i>=3 && j<=7)
+						{
+							var a=document.getElementById("img"+(i-2)+(j+1)+"").src;
+							var pos=a.lastIndexOf("/");
+							var srcRelativo=a.substring(pos+1);
+									
+							if(srcRelativo=="vuota.png")	//se non c'e' un oggetto
+							{
+								possibileMovimento[contaMosse]=""+(i-2)+(j+1)+"";
+								contaMosse++;
+							}
+							else if(srcRelativo=="alfiere_b.png" || srcRelativo=="cavallo_b.png" || srcRelativo=="pedone_b.png" || srcRelativo=="re_b.png" || srcRelativo=="regina_b.png" || srcRelativo=="torre_b.png")	//se c'e' un bianco
+							{
+								possibileMangiataSu2=""+(i-2)+(j+1)+"";
+								document.getElementById("td"+possibileMangiataSu2+"").style.backgroundColor="green";
+							}
+						}
+						
+						//movimento a L 2 in giu e 1 a sx
+						if(i<=6 && j>=2)
+						{
+							var a=document.getElementById("img"+(i+2)+(j-1)+"").src;
+							var pos=a.lastIndexOf("/");
+							var srcRelativo=a.substring(pos+1);
+									
+							if(srcRelativo=="vuota.png")	//se non c'e' un oggetto
+							{
+								possibileMovimento[contaMosse]=""+(i+2)+(j-1)+"";
+								contaMosse++;
+							}
+							else if(srcRelativo=="alfiere_b.png" || srcRelativo=="cavallo_b.png" || srcRelativo=="pedone_b.png" || srcRelativo=="re_b.png" || srcRelativo=="regina_b.png" || srcRelativo=="torre_b.png")	//se c'e' un bianco
+							{
+								possibileMangiataGiu=""+(i+2)+(j-1)+"";
+								document.getElementById("td"+possibileMangiataGiu+"").style.backgroundColor="green";
+							}
+						}
+						
+						//movimento a L 2 in giu e 1 a dx
+						if(i<=6 && j<=7)
+						{
+							var a=document.getElementById("img"+(i+2)+(j+1)+"").src;
+							var pos=a.lastIndexOf("/");
+							var srcRelativo=a.substring(pos+1);
+									
+							if(srcRelativo=="vuota.png")	//se non c'e' un oggetto
+							{
+								possibileMovimento[contaMosse]=""+(i+2)+(j+1)+"";
+								contaMosse++;
+							}
+							else if(srcRelativo=="alfiere_b.png" || srcRelativo=="cavallo_b.png" || srcRelativo=="pedone_b.png" || srcRelativo=="re_b.png" || srcRelativo=="regina_b.png" || srcRelativo=="torre_b.png")	//se c'e' un bianco
+							{
+								possibileMangiataGiu2=""+(i+2)+(j+1)+"";
+								document.getElementById("td"+possibileMangiataGiu2+"").style.backgroundColor="green";
+							}
+						}
+						
+						//movimento a L 2 a sx e 1 su
+						if(i>=2 && j>=3)
+						{
+							var a=document.getElementById("img"+(i-1)+(j-2)+"").src;
+							var pos=a.lastIndexOf("/");
+							var srcRelativo=a.substring(pos+1);
+									
+							if(srcRelativo=="vuota.png")	//se non c'e' un oggetto
+							{
+								possibileMovimento[contaMosse]=""+(i-1)+(j-2)+"";
+								contaMosse++;
+							}
+							else if(srcRelativo=="alfiere_b.png" || srcRelativo=="cavallo_b.png" || srcRelativo=="pedone_b.png" || srcRelativo=="re_b.png" || srcRelativo=="regina_b.png" || srcRelativo=="torre_b.png")	//se c'e' un bianco
+							{
+								possibileMangiataSX=""+(i-1)+(j-2)+"";
+								document.getElementById("td"+possibileMangiataSX+"").style.backgroundColor="green";
+							}
+						}
+						
+						//movimento a L 2 a sx e 1 giu
+						if(i<=7 && j>=3)
+						{
+							var a=document.getElementById("img"+(i+1)+(j-2)+"").src;
+							var pos=a.lastIndexOf("/");
+							var srcRelativo=a.substring(pos+1);
+									
+							if(srcRelativo=="vuota.png")	//se non c'e' un oggetto
+							{
+								possibileMovimento[contaMosse]=""+(i+1)+(j-2)+"";
+								contaMosse++;
+							}
+							else if(srcRelativo=="alfiere_b.png" || srcRelativo=="cavallo_b.png" || srcRelativo=="pedone_b.png" || srcRelativo=="re_b.png" || srcRelativo=="regina_b.png" || srcRelativo=="torre_b.png")	//se c'e' un bianco
+							{
+								possibileMangiataSX2=""+(i+1)+(j-2)+"";
+								document.getElementById("td"+possibileMangiataSX2+"").style.backgroundColor="green";
+							}
+						}
+						
+						//movimento a L 2 a dx e 1 su
+						if(i>=2 && j<=6)
+						{
+							var a=document.getElementById("img"+(i-1)+(j+2)+"").src;
+							var pos=a.lastIndexOf("/");
+							var srcRelativo=a.substring(pos+1);
+									
+							if(srcRelativo=="vuota.png")	//se non c'e' un oggetto
+							{
+								possibileMovimento[contaMosse]=""+(i-1)+(j+2)+"";
+								contaMosse++;
+							}
+							else if(srcRelativo=="alfiere_b.png" || srcRelativo=="cavallo_b.png" || srcRelativo=="pedone_b.png" || srcRelativo=="re_b.png" || srcRelativo=="regina_b.png" || srcRelativo=="torre_b.png")	//se c'e' un bianco
+							{
+								possibileMangiataDX=""+(i-1)+(j+2)+"";
+								document.getElementById("td"+possibileMangiataDX+"").style.backgroundColor="green";
+							}
+						}
+						
+						//movimento a L 2 a dx e 1 giu
+						if(i<=7 && j<=6)
+						{
+							var a=document.getElementById("img"+(i+1)+(j+2)+"").src;
+							var pos=a.lastIndexOf("/");
+							var srcRelativo=a.substring(pos+1);
+									
+							if(srcRelativo=="vuota.png")	//se non c'e' un oggetto
+							{
+								possibileMovimento[contaMosse]=""+(i+1)+(j+2)+"";
+								contaMosse++;
+							}
+							else if(srcRelativo=="alfiere_b.png" || srcRelativo=="cavallo_b.png" || srcRelativo=="pedone_b.png" || srcRelativo=="re_b.png" || srcRelativo=="regina_b.png" || srcRelativo=="torre_b.png")	//se c'e' un bianco
+							{
+								possibileMangiataDX2=""+(i+1)+(j+2)+"";
+								document.getElementById("td"+possibileMangiataDX2+"").style.backgroundColor="green";
+							}
+						}
+					
+					for(var contatore=0;contatore<contaMosse;contatore++)
+						document.getElementById("td"+possibileMovimento[contatore]+"").style.backgroundColor="lightblue";
+					turno=1;
+				}
+				else
+					alert("Tocca all'altro giocatore!");
+			}
+			
+			else //secondo oggetto selezionato : ricevente
+			{
+				document.getElementById("td"+vettore[0]+"").style.backgroundColor=vettore[2];
+				vettore[1]=""+i+j+"";
+				
+				//controllo movimento
+				for(var contatore=0;contatore<contaMosse;contatore++)
+				{
+					if(vettore[1]==possibileMovimento[contatore])
+					{
+						secondo();
+						break;
+					}
+				}
+				if(vettore[1]==possibileMangiataSX) //controllo mangiata SX
+					secondo();
+				else if (vettore[1]==possibileMangiataDX) //controllo mangiata DX
+					secondo();
+				else if (vettore[1]==possibileMangiataSu) //controllo mangiata Su
+					secondo();
+				else if (vettore[1]==possibileMangiataGiu) //controllo mangiata Giu
+					secondo();
+				else if(vettore[1]==possibileMangiataSX2) //controllo mangiata SX2(cavallo)
+					secondo();
+				else if (vettore[1]==possibileMangiataDX2) //controllo mangiata DX2(cavallo)
+					secondo();
+				else if (vettore[1]==possibileMangiataSu2) //controllo mangiata Su2(cavallo)
+					secondo();
+				else if (vettore[1]==possibileMangiataGiu2) //controllo mangiata Giu2(cavallo)
+					secondo();
+				else
+					mossaNonConsentita();
+			}
+		}
+		
+		function cavalloBianco(i,j)
+		{
+			if(vettore[0]=="0")	//primo oggetto selezionato : mittente
+			{
+				if(turno==1)
+				{
+					vettore[0]=""+i+j+"";
+					vettore[2]=document.getElementById("td"+vettore[0]+"").style.backgroundColor;
+					document.getElementById("td"+vettore[0]+"").style.backgroundColor="red";
+					
+					//possibili movimenti
+						//movimento a L 2 in su e 1 a sx
+						if(i>=3 && j>=2)
+						{
+							var a=document.getElementById("img"+(i-2)+(j-1)+"").src;
+							var pos=a.lastIndexOf("/");
+							var srcRelativo=a.substring(pos+1);
+								
+							if(srcRelativo=="vuota.png")	//se non c'e' un oggetto
+							{
+								possibileMovimento[contaMosse]=""+(i-2)+(j-1)+"";
+								contaMosse++;
+							}
+							else if(srcRelativo=="alfiere_n.png" || srcRelativo=="cavallo_n.png" || srcRelativo=="pedone_n.png" || srcRelativo=="re_n.png" || srcRelativo=="regina_n.png" || srcRelativo=="torre_n.png")	//se c'e' un nero
+							{
+								possibileMangiataSu=""+(i-2)+(j-1)+"";
+								document.getElementById("td"+possibileMangiataSu+"").style.backgroundColor="green";
+							}
+						}
+						
+						//movimento a L 2 in su e 1 a dx
+						if(i>=3 && j<=7)
+						{
+							var a=document.getElementById("img"+(i-2)+(j+1)+"").src;
+							var pos=a.lastIndexOf("/");
+							var srcRelativo=a.substring(pos+1);
+									
+							if(srcRelativo=="vuota.png")	//se non c'e' un oggetto
+							{
+								possibileMovimento[contaMosse]=""+(i-2)+(j+1)+"";
+								contaMosse++;
+							}
+							else if(srcRelativo=="alfiere_n.png" || srcRelativo=="cavallo_n.png" || srcRelativo=="pedone_n.png" || srcRelativo=="re_n.png" || srcRelativo=="regina_n.png" || srcRelativo=="torre_n.png")	//se c'e' un nero
+							{
+								possibileMangiataSu2=""+(i-2)+(j+1)+"";
+								document.getElementById("td"+possibileMangiataSu2+"").style.backgroundColor="green";
+							}
+						}
+						
+						//movimento a L 2 in giu e 1 a sx
+						if(i<=6 && j>=2)
+						{
+							var a=document.getElementById("img"+(i+2)+(j-1)+"").src;
+							var pos=a.lastIndexOf("/");
+							var srcRelativo=a.substring(pos+1);
+									
+							if(srcRelativo=="vuota.png")	//se non c'e' un oggetto
+							{
+								possibileMovimento[contaMosse]=""+(i+2)+(j-1)+"";
+								contaMosse++;
+							}
+							else if(srcRelativo=="alfiere_n.png" || srcRelativo=="cavallo_n.png" || srcRelativo=="pedone_n.png" || srcRelativo=="re_n.png" || srcRelativo=="regina_n.png" || srcRelativo=="torre_n.png")	//se c'e' un nero
+							{
+								possibileMangiataGiu=""+(i+2)+(j-1)+"";
+								document.getElementById("td"+possibileMangiataGiu+"").style.backgroundColor="green";
+							}
+						}
+						
+						//movimento a L 2 in giu e 1 a dx
+						if(i<=6 && j<=7)
+						{
+							var a=document.getElementById("img"+(i+2)+(j+1)+"").src;
+							var pos=a.lastIndexOf("/");
+							var srcRelativo=a.substring(pos+1);
+									
+							if(srcRelativo=="vuota.png")	//se non c'e' un oggetto
+							{
+								possibileMovimento[contaMosse]=""+(i+2)+(j+1)+"";
+								contaMosse++;
+							}
+							else if(srcRelativo=="alfiere_n.png" || srcRelativo=="cavallo_n.png" || srcRelativo=="pedone_n.png" || srcRelativo=="re_n.png" || srcRelativo=="regina_n.png" || srcRelativo=="torre_n.png")	//se c'e' un nero
+							{
+								possibileMangiataGiu2=""+(i+2)+(j+1)+"";
+								document.getElementById("td"+possibileMangiataGiu2+"").style.backgroundColor="green";
+							}
+						}
+						
+						//movimento a L 2 a sx e 1 su
+						if(i>=2 && j>=3)
+						{
+							var a=document.getElementById("img"+(i-1)+(j-2)+"").src;
+							var pos=a.lastIndexOf("/");
+							var srcRelativo=a.substring(pos+1);
+									
+							if(srcRelativo=="vuota.png")	//se non c'e' un oggetto
+							{
+								possibileMovimento[contaMosse]=""+(i-1)+(j-2)+"";
+								contaMosse++;
+							}
+							else if(srcRelativo=="alfiere_n.png" || srcRelativo=="cavallo_n.png" || srcRelativo=="pedone_n.png" || srcRelativo=="re_n.png" || srcRelativo=="regina_n.png" || srcRelativo=="torre_n.png")	//se c'e' un nero
+							{
+								possibileMangiataSX=""+(i-1)+(j-2)+"";
+								document.getElementById("td"+possibileMangiataSX+"").style.backgroundColor="green";
+							}
+						}
+						
+						//movimento a L 2 a sx e 1 giu
+						if(i<=7 && j>=3)
+						{
+							var a=document.getElementById("img"+(i+1)+(j-2)+"").src;
+							var pos=a.lastIndexOf("/");
+							var srcRelativo=a.substring(pos+1);
+									
+							if(srcRelativo=="vuota.png")	//se non c'e' un oggetto
+							{
+								possibileMovimento[contaMosse]=""+(i+1)+(j-2)+"";
+								contaMosse++;
+							}
+							else if(srcRelativo=="alfiere_n.png" || srcRelativo=="cavallo_n.png" || srcRelativo=="pedone_n.png" || srcRelativo=="re_n.png" || srcRelativo=="regina_n.png" || srcRelativo=="torre_n.png")	//se c'e' un nero
+							{
+								possibileMangiataSX2=""+(i+1)+(j-2)+"";
+								document.getElementById("td"+possibileMangiataSX2+"").style.backgroundColor="green";
+							}
+						}
+						
+						//movimento a L 2 a dx e 1 su
+						if(i>=2 && j<=6)
+						{
+							var a=document.getElementById("img"+(i-1)+(j+2)+"").src;
+							var pos=a.lastIndexOf("/");
+							var srcRelativo=a.substring(pos+1);
+									
+							if(srcRelativo=="vuota.png")	//se non c'e' un oggetto
+							{
+								possibileMovimento[contaMosse]=""+(i-1)+(j+2)+"";
+								contaMosse++;
+							}
+							else if(srcRelativo=="alfiere_n.png" || srcRelativo=="cavallo_n.png" || srcRelativo=="pedone_n.png" || srcRelativo=="re_n.png" || srcRelativo=="regina_n.png" || srcRelativo=="torre_n.png")	//se c'e' un nero
+							{
+								possibileMangiataDX=""+(i-1)+(j+2)+"";
+								document.getElementById("td"+possibileMangiataDX+"").style.backgroundColor="green";
+							}
+						}
+						
+						//movimento a L 2 a dx e 1 giu
+						if(i<=7 && j<=6)
+						{
+							var a=document.getElementById("img"+(i+1)+(j+2)+"").src;
+							var pos=a.lastIndexOf("/");
+							var srcRelativo=a.substring(pos+1);
+									
+							if(srcRelativo=="vuota.png")	//se non c'e' un oggetto
+							{
+								possibileMovimento[contaMosse]=""+(i+1)+(j+2)+"";
+								contaMosse++;
+							}
+							else if(srcRelativo=="alfiere_n.png" || srcRelativo=="cavallo_n.png" || srcRelativo=="pedone_n.png" || srcRelativo=="re_n.png" || srcRelativo=="regina_n.png" || srcRelativo=="torre_n.png")	//se c'e' un nero
+							{
+								possibileMangiataDX2=""+(i+1)+(j+2)+"";
+								document.getElementById("td"+possibileMangiataDX2+"").style.backgroundColor="green";
+							}
+						}
+					
+					for(var contatore=0;contatore<contaMosse;contatore++)
+						document.getElementById("td"+possibileMovimento[contatore]+"").style.backgroundColor="lightblue";
+					turno=0;
+				}
+				else
+					alert("Tocca all'altro giocatore!");
+			}
+			
+			else //secondo oggetto selezionato : ricevente
+			{
+				document.getElementById("td"+vettore[0]+"").style.backgroundColor=vettore[2];
+				vettore[1]=""+i+j+"";
+				
+				//controllo movimento
+				for(var contatore=0;contatore<contaMosse;contatore++)
+				{
+					if(vettore[1]==possibileMovimento[contatore])
+					{
+						secondo();
+						break;
+					}
+				}
+				if(vettore[1]==possibileMangiataSX) //controllo mangiata SX
+					secondo();
+				else if (vettore[1]==possibileMangiataDX) //controllo mangiata DX
+					secondo();
+				else if (vettore[1]==possibileMangiataSu) //controllo mangiata Su
+					secondo();
+				else if (vettore[1]==possibileMangiataGiu) //controllo mangiata Giu
+					secondo();
+				else if(vettore[1]==possibileMangiataSX2) //controllo mangiata SX2(cavallo)
+					secondo();
+				else if (vettore[1]==possibileMangiataDX2) //controllo mangiata DX2(cavallo)
+					secondo();
+				else if (vettore[1]==possibileMangiataSu2) //controllo mangiata Su2(cavallo)
+					secondo();
+				else if (vettore[1]==possibileMangiataGiu2) //controllo mangiata Giu2(cavallo)
+					secondo();
+				else
+					mossaNonConsentita();
+			}
+		}
+		
+		function reginaNero(i,j)
+		{
+			if(vettore[0]=="0")	//primo oggetto selezionato : mittente
+			{
+				if(turno==0)
+				{
+					vettore[0]=""+i+j+"";
+					vettore[2]=document.getElementById("td"+vettore[0]+"").style.backgroundColor;
+					document.getElementById("td"+vettore[0]+"").style.backgroundColor="red";
+					
+					//possibili movimenti
+					var controllo=0;	//per controllare i vari movimenti possibili della torre
+					var iIniziale=i;
+					var jIniziale=j;
+					
+					//movimento in su
+					do{
+						if(i>=2)
+						{
+							var a=document.getElementById("img"+(i-1)+j+"").src;
+							var pos=a.lastIndexOf("/");
+							var srcRelativo=a.substring(pos+1);
+								
+							if(srcRelativo=="vuota.png")	//se non c'e' un oggetto
+							{
+								possibileMovimento[contaMosse]=""+(i-1)+j+"";
+								contaMosse++;
+								controllo=1;
+								i--;
+							}
+							else if(srcRelativo=="alfiere_b.png" || srcRelativo=="cavallo_b.png" || srcRelativo=="pedone_b.png" || srcRelativo=="re_b.png" || srcRelativo=="regina_b.png" || srcRelativo=="torre_b.png")	//se c'e' un bianco
+							{
+								possibileMangiataSu=""+(i-1)+j+"";
+								document.getElementById("td"+possibileMangiataSu+"").style.backgroundColor="green";
+								controllo=0;
+							}
+							else
+								controllo=0;
+						}
+						else
+							controllo=0;
+					}while(controllo==1);
+					
+					i=iIniziale;
+					
+					//movimento in giu
+					do{
+						if(i<=7)
+						{
+							var a=document.getElementById("img"+(i+1)+j+"").src;
+							var pos=a.lastIndexOf("/");
+							var srcRelativo=a.substring(pos+1);
+								
+							if(srcRelativo=="vuota.png")	//se non c'e' un oggetto
+							{
+								possibileMovimento[contaMosse]=""+(i+1)+j+"";
+								contaMosse++;
+								controllo=1;
+								i++;
+							}
+							else if(srcRelativo=="alfiere_b.png" || srcRelativo=="cavallo_b.png" || srcRelativo=="pedone_b.png" || srcRelativo=="re_b.png" || srcRelativo=="regina_b.png" || srcRelativo=="torre_b.png")	//se c'e' un bianco
+							{
+								possibileMangiataGiu=""+(i+1)+j+"";
+								document.getElementById("td"+possibileMangiataGiu+"").style.backgroundColor="green";
+								controllo=0;
+							}
+							else
+								controllo=0;
+						}
+						else
+							controllo=0;
+					}while(controllo==1);
+					
+					i=iIniziale;
+					
+					//movimento a sinistra
+					do{
+						if(j>=2)
+						{
+							var a=document.getElementById("img"+i+(j-1)+"").src;
+							var pos=a.lastIndexOf("/");
+							var srcRelativo=a.substring(pos+1);
+								
+							if(srcRelativo=="vuota.png")	//se non c'e' un oggetto
+							{
+								possibileMovimento[contaMosse]=""+i+(j-1)+"";
+								contaMosse++;
+								controllo=1;
+								j--;
+							}
+							else if(srcRelativo=="alfiere_b.png" || srcRelativo=="cavallo_b.png" || srcRelativo=="pedone_b.png" || srcRelativo=="re_b.png" || srcRelativo=="regina_b.png" || srcRelativo=="torre_b.png")	//se c'e' un bianco
+							{
+								possibileMangiataSX=""+i+(j-1)+"";
+								document.getElementById("td"+possibileMangiataSX+"").style.backgroundColor="green";
+								controllo=0;
+							}
+							else
+								controllo=0;
+						}
+						else
+							controllo=0;				
+					}while(controllo==1);
+					
+					j=jIniziale;
+					
+					//movimento a destra
+					do{
+						if(j<=7)
+						{
+							var a=document.getElementById("img"+i+(j+1)+"").src;
+							var pos=a.lastIndexOf("/");
+							var srcRelativo=a.substring(pos+1);
+								
+							if(srcRelativo=="vuota.png")	//se non c'e' un oggetto
+							{
+								possibileMovimento[contaMosse]=""+i+(j+1)+"";
+								contaMosse++;
+								controllo=1;
+								j++;
+							}
+							else if(srcRelativo=="alfiere_b.png" || srcRelativo=="cavallo_b.png" || srcRelativo=="pedone_b.png" || srcRelativo=="re_b.png" || srcRelativo=="regina_b.png" || srcRelativo=="torre_b.png")	//se c'e' un bianco
+							{
+								possibileMangiataDX=""+i+(j+1)+"";
+								document.getElementById("td"+possibileMangiataDX+"").style.backgroundColor="green";
+								controllo=0;
+							}
+							else
+								controllo=0;
+						}
+						else
+							controllo=0;				
+					}while(controllo==1);
+					
+					j=jIniziale;
+					
+					//movimento in su a sinistra
+					do{
+						if(i>=2 && j>=2)
+						{
+							var a=document.getElementById("img"+(i-1)+(j-1)+"").src;
+							var pos=a.lastIndexOf("/");
+							var srcRelativo=a.substring(pos+1);
+								
+							if(srcRelativo=="vuota.png")	//se non c'e' un oggetto
+							{
+								possibileMovimento[contaMosse]=""+(i-1)+(j-1)+"";
+								contaMosse++;
+								controllo=1;
+								i--;
+								j--;
+							}
+							else if(srcRelativo=="alfiere_b.png" || srcRelativo=="cavallo_b.png" || srcRelativo=="pedone_b.png" || srcRelativo=="re_b.png" || srcRelativo=="regina_b.png" || srcRelativo=="torre_b.png")	//se c'e' un bianco
+							{
+								possibileMangiataSu2=""+(i-1)+(j-1)+"";
+								document.getElementById("td"+possibileMangiataSu2+"").style.backgroundColor="green";
+								controllo=0;
+							}
+							else
+								controllo=0;
+						}
+						else
+							controllo=0;
+					}while(controllo==1);
+					
+					i=iIniziale;
+					j=jIniziale;
+					
+					//movimento in giu a destra
+					do{
+						if(i<=7 && j<=7)
+						{
+							var a=document.getElementById("img"+(i+1)+(j+1)+"").src;
+							var pos=a.lastIndexOf("/");
+							var srcRelativo=a.substring(pos+1);
+								
+							if(srcRelativo=="vuota.png")	//se non c'e' un oggetto
+							{
+								possibileMovimento[contaMosse]=""+(i+1)+(j+1)+"";
+								contaMosse++;
+								controllo=1;
+								i++;
+								j++;
+							}
+							else if(srcRelativo=="alfiere_b.png" || srcRelativo=="cavallo_b.png" || srcRelativo=="pedone_b.png" || srcRelativo=="re_b.png" || srcRelativo=="regina_b.png" || srcRelativo=="torre_b.png")	//se c'e' un bianco
+							{
+								possibileMangiataGiu2=""+(i+1)+(j+1)+"";
+								document.getElementById("td"+possibileMangiataGiu2+"").style.backgroundColor="green";
+								controllo=0;
+							}
+							else
+								controllo=0;
+						}
+						else
+							controllo=0;
+					}while(controllo==1);
+					
+					i=iIniziale;
+					j=jIniziale;
+					
+					//movimento in giu a sinistra
+					do{
+						if(i<=7 && j>=2)
+						{
+							var a=document.getElementById("img"+(i+1)+(j-1)+"").src;
+							var pos=a.lastIndexOf("/");
+							var srcRelativo=a.substring(pos+1);
+								
+							if(srcRelativo=="vuota.png")	//se non c'e' un oggetto
+							{
+								possibileMovimento[contaMosse]=""+(i+1)+(j-1)+"";
+								contaMosse++;
+								controllo=1;
+								i++;
+								j--;
+							}
+							else if(srcRelativo=="alfiere_b.png" || srcRelativo=="cavallo_b.png" || srcRelativo=="pedone_b.png" || srcRelativo=="re_b.png" || srcRelativo=="regina_b.png" || srcRelativo=="torre_b.png")	//se c'e' un bianco
+							{
+								possibileMangiataSX2=""+(i+1)+(j-1)+"";
+								document.getElementById("td"+possibileMangiataSX2+"").style.backgroundColor="green";
+								controllo=0;
+							}
+							else
+								controllo=0;
+						}
+						else
+							controllo=0;				
+					}while(controllo==1);
+					
+					i=iIniziale;
+					j=jIniziale;
+					
+					//movimento su a destra
+					do{
+						if(i>=2 && j<=7)
+						{
+							var a=document.getElementById("img"+(i-1)+(j+1)+"").src;
+							var pos=a.lastIndexOf("/");
+							var srcRelativo=a.substring(pos+1);
+								
+							if(srcRelativo=="vuota.png")	//se non c'e' un oggetto
+							{
+								possibileMovimento[contaMosse]=""+(i-1)+(j+1)+"";
+								contaMosse++;
+								controllo=1;
+								i--;
+								j++;
+							}
+							else if(srcRelativo=="alfiere_b.png" || srcRelativo=="cavallo_b.png" || srcRelativo=="pedone_b.png" || srcRelativo=="re_b.png" || srcRelativo=="regina_b.png" || srcRelativo=="torre_b.png")	//se c'e' un bianco
+							{
+								possibileMangiataDX2=""+(i-1)+(j+1)+"";
+								document.getElementById("td"+possibileMangiataDX2+"").style.backgroundColor="green";
+								controllo=0;
+							}
+							else
+								controllo=0;
+						}
+						else
+							controllo=0;				
+					}while(controllo==1);
+					
+					i=iIniziale;
+					j=jIniziale;
+					
+					for(var contatore=0;contatore<contaMosse;contatore++)
+						document.getElementById("td"+possibileMovimento[contatore]+"").style.backgroundColor="lightblue";
+					turno=1;
+				}
+				else
+					alert("Tocca all'altro giocatore!");
+			}
+			
+			else //secondo oggetto selezionato : ricevente
+			{
+				document.getElementById("td"+vettore[0]+"").style.backgroundColor=vettore[2];
+				vettore[1]=""+i+j+"";
+				
+				//controllo movimento
+				for(var contatore=0;contatore<contaMosse;contatore++)
+				{
+					if(vettore[1]==possibileMovimento[contatore])
+					{
+						secondo();
+						break;
+					}
+				}
+				if(vettore[1]==possibileMangiataSX) //controllo mangiata SX
+					secondo();
+				else if (vettore[1]==possibileMangiataDX) //controllo mangiata DX
+					secondo();
+				else if (vettore[1]==possibileMangiataSu) //controllo mangiata Su
+					secondo();
+				else if (vettore[1]==possibileMangiataGiu) //controllo mangiata Giu
+					secondo();
+				else if(vettore[1]==possibileMangiataSX2) //controllo mangiata SX2(cavallo)
+					secondo();
+				else if (vettore[1]==possibileMangiataDX2) //controllo mangiata DX2(cavallo)
+					secondo();
+				else if (vettore[1]==possibileMangiataSu2) //controllo mangiata Su2(cavallo)
+					secondo();
+				else if (vettore[1]==possibileMangiataGiu2) //controllo mangiata Giu2(cavallo)
+					secondo();
+				else
+					mossaNonConsentita();
+			}
+		}
+		
+		
+		function reginaBianco(i,j)
+		{
+			if(vettore[0]=="0")	//primo oggetto selezionato : mittente
+			{
+				if(turno==1)
+				{
+					vettore[0]=""+i+j+"";
+					vettore[2]=document.getElementById("td"+vettore[0]+"").style.backgroundColor;
+					document.getElementById("td"+vettore[0]+"").style.backgroundColor="red";
+					
+					//possibili movimenti
+					var controllo=0;	//per controllare i vari movimenti possibili della torre
+					var iIniziale=i;
+					var jIniziale=j;
+					
+					//movimento in su
+					do{
+						if(i>=2)
+						{
+							var a=document.getElementById("img"+(i-1)+j+"").src;
+							var pos=a.lastIndexOf("/");
+							var srcRelativo=a.substring(pos+1);
+								
+							if(srcRelativo=="vuota.png")	//se non c'e' un oggetto
+							{
+								possibileMovimento[contaMosse]=""+(i-1)+j+"";
+								contaMosse++;
+								controllo=1;
+								i--;
+							}
+							else if(srcRelativo=="alfiere_n.png" || srcRelativo=="cavallo_n.png" || srcRelativo=="pedone_n.png" || srcRelativo=="re_n.png" || srcRelativo=="regina_n.png" || srcRelativo=="torre_n.png")	//se c'e' un nero
+							{
+								possibileMangiataSu=""+(i-1)+j+"";
+								document.getElementById("td"+possibileMangiataSu+"").style.backgroundColor="green";
+								controllo=0;
+							}
+							else
+								controllo=0;
+						}
+						else
+							controllo=0;
+					}while(controllo==1);
+					
+					i=iIniziale;
+					
+					//movimento in giu
+					do{
+						if(i<=7)
+						{
+							var a=document.getElementById("img"+(i+1)+j+"").src;
+							var pos=a.lastIndexOf("/");
+							var srcRelativo=a.substring(pos+1);
+								
+							if(srcRelativo=="vuota.png")	//se non c'e' un oggetto
+							{
+								possibileMovimento[contaMosse]=""+(i+1)+j+"";
+								contaMosse++;
+								controllo=1;
+								i++;
+							}
+							else if(srcRelativo=="alfiere_n.png" || srcRelativo=="cavallo_n.png" || srcRelativo=="pedone_n.png" || srcRelativo=="re_n.png" || srcRelativo=="regina_n.png" || srcRelativo=="torre_n.png")	//se c'e' un nero
+							{
+								possibileMangiataGiu=""+(i+1)+j+"";
+								document.getElementById("td"+possibileMangiataGiu+"").style.backgroundColor="green";
+								controllo=0;
+							}
+							else
+								controllo=0;
+						}
+						else
+							controllo=0;
+					}while(controllo==1);
+					
+					i=iIniziale;
+					
+					//movimento a sinistra
+					do{
+						if(j>=2)
+						{
+							var a=document.getElementById("img"+i+(j-1)+"").src;
+							var pos=a.lastIndexOf("/");
+							var srcRelativo=a.substring(pos+1);
+								
+							if(srcRelativo=="vuota.png")	//se non c'e' un oggetto
+							{
+								possibileMovimento[contaMosse]=""+i+(j-1)+"";
+								contaMosse++;
+								controllo=1;
+								j--;
+							}
+							else if(srcRelativo=="alfiere_n.png" || srcRelativo=="cavallo_n.png" || srcRelativo=="pedone_n.png" || srcRelativo=="re_n.png" || srcRelativo=="regina_n.png" || srcRelativo=="torre_n.png")	//se c'e' un nero
+							{
+								possibileMangiataSX=""+i+(j-1)+"";
+								document.getElementById("td"+possibileMangiataSX+"").style.backgroundColor="green";
+								controllo=0;
+							}
+							else
+								controllo=0;
+						}
+						else
+							controllo=0;				
+					}while(controllo==1);
+					
+					j=jIniziale;
+					
+					//movimento a destra
+					do{
+						if(j<=7)
+						{
+							var a=document.getElementById("img"+i+(j+1)+"").src;
+							var pos=a.lastIndexOf("/");
+							var srcRelativo=a.substring(pos+1);
+								
+							if(srcRelativo=="vuota.png")	//se non c'e' un oggetto
+							{
+								possibileMovimento[contaMosse]=""+i+(j+1)+"";
+								contaMosse++;
+								controllo=1;
+								j++;
+							}
+							else if(srcRelativo=="alfiere_n.png" || srcRelativo=="cavallo_n.png" || srcRelativo=="pedone_n.png" || srcRelativo=="re_n.png" || srcRelativo=="regina_n.png" || srcRelativo=="torre_n.png")	//se c'e' un nero
+							{
+								possibileMangiataDX=""+i+(j+1)+"";
+								document.getElementById("td"+possibileMangiataDX+"").style.backgroundColor="green";
+								controllo=0;
+							}
+							else
+								controllo=0;
+						}
+						else
+							controllo=0;				
+					}while(controllo==1);
+					
+					j=jIniziale;
+					
+					//movimento in su a sinistra
+					do{
+						if(i>=2 && j>=2)
+						{
+							var a=document.getElementById("img"+(i-1)+(j-1)+"").src;
+							var pos=a.lastIndexOf("/");
+							var srcRelativo=a.substring(pos+1);
+								
+							if(srcRelativo=="vuota.png")	//se non c'e' un oggetto
+							{
+								possibileMovimento[contaMosse]=""+(i-1)+(j-1)+"";
+								contaMosse++;
+								controllo=1;
+								i--;
+								j--;
+							}
+							else if(srcRelativo=="alfiere_n.png" || srcRelativo=="cavallo_n.png" || srcRelativo=="pedone_n.png" || srcRelativo=="re_n.png" || srcRelativo=="regina_n.png" || srcRelativo=="torre_n.png")	//se c'e' un nero
+							{
+								possibileMangiataSu2=""+(i-1)+(j-1)+"";
+								document.getElementById("td"+possibileMangiataSu2+"").style.backgroundColor="green";
+								controllo=0;
+							}
+							else
+								controllo=0;
+						}
+						else
+							controllo=0;
+					}while(controllo==1);
+					
+					i=iIniziale;
+					j=jIniziale;
+					
+					//movimento in giu a destra
+					do{
+						if(i<=7 && j<=7)
+						{
+							var a=document.getElementById("img"+(i+1)+(j+1)+"").src;
+							var pos=a.lastIndexOf("/");
+							var srcRelativo=a.substring(pos+1);
+								
+							if(srcRelativo=="vuota.png")	//se non c'e' un oggetto
+							{
+								possibileMovimento[contaMosse]=""+(i+1)+(j+1)+"";
+								contaMosse++;
+								controllo=1;
+								i++;
+								j++;
+							}
+							else if(srcRelativo=="alfiere_n.png" || srcRelativo=="cavallo_n.png" || srcRelativo=="pedone_n.png" || srcRelativo=="re_n.png" || srcRelativo=="regina_n.png" || srcRelativo=="torre_n.png")	//se c'e' un nero
+							{
+								possibileMangiataGiu2=""+(i+1)+(j+1)+"";
+								document.getElementById("td"+possibileMangiataGiu2+"").style.backgroundColor="green";
+								controllo=0;
+							}
+							else
+								controllo=0;
+						}
+						else
+							controllo=0;
+					}while(controllo==1);
+					
+					i=iIniziale;
+					j=jIniziale;
+					
+					//movimento in giu a sinistra
+					do{
+						if(i<=7 && j>=2)
+						{
+							var a=document.getElementById("img"+(i+1)+(j-1)+"").src;
+							var pos=a.lastIndexOf("/");
+							var srcRelativo=a.substring(pos+1);
+								
+							if(srcRelativo=="vuota.png")	//se non c'e' un oggetto
+							{
+								possibileMovimento[contaMosse]=""+(i+1)+(j-1)+"";
+								contaMosse++;
+								controllo=1;
+								i++;
+								j--;
+							}
+							else if(srcRelativo=="alfiere_n.png" || srcRelativo=="cavallo_n.png" || srcRelativo=="pedone_n.png" || srcRelativo=="re_n.png" || srcRelativo=="regina_n.png" || srcRelativo=="torre_n.png")	//se c'e' un nero
+							{
+								possibileMangiataSX2=""+(i+1)+(j-1)+"";
+								document.getElementById("td"+possibileMangiataSX2+"").style.backgroundColor="green";
+								controllo=0;
+							}
+							else
+								controllo=0;
+						}
+						else
+							controllo=0;				
+					}while(controllo==1);
+					
+					i=iIniziale;
+					j=jIniziale;
+					
+					//movimento su a destra
+					do{
+						if(i>=2 && j<=7)
+						{
+							var a=document.getElementById("img"+(i-1)+(j+1)+"").src;
+							var pos=a.lastIndexOf("/");
+							var srcRelativo=a.substring(pos+1);
+								
+							if(srcRelativo=="vuota.png")	//se non c'e' un oggetto
+							{
+								possibileMovimento[contaMosse]=""+(i-1)+(j+1)+"";
+								contaMosse++;
+								controllo=1;
+								i--;
+								j++;
+							}
+							else if(srcRelativo=="alfiere_n.png" || srcRelativo=="cavallo_n.png" || srcRelativo=="pedone_n.png" || srcRelativo=="re_n.png" || srcRelativo=="regina_n.png" || srcRelativo=="torre_n.png")	//se c'e' un nero
+							{
+								possibileMangiataDX2=""+(i-1)+(j+1)+"";
+								document.getElementById("td"+possibileMangiataDX2+"").style.backgroundColor="green";
+								controllo=0;
+							}
+							else
+								controllo=0;
+						}
+						else
+							controllo=0;				
+					}while(controllo==1);
+					
+					i=iIniziale;
+					j=jIniziale;
+					
+					for(var contatore=0;contatore<contaMosse;contatore++)
+						document.getElementById("td"+possibileMovimento[contatore]+"").style.backgroundColor="lightblue";
+					turno=0;
+				}
+				else
+					alert("Tocca all'altro giocatore!");
+			}
+			
+			else //secondo oggetto selezionato : ricevente
+			{
+				document.getElementById("td"+vettore[0]+"").style.backgroundColor=vettore[2];
+				vettore[1]=""+i+j+"";
+				
+				//controllo movimento
+				for(var contatore=0;contatore<contaMosse;contatore++)
+				{
+					if(vettore[1]==possibileMovimento[contatore])
+					{
+						secondo();
+						break;
+					}
+				}
+				if(vettore[1]==possibileMangiataSX) //controllo mangiata SX
+					secondo();
+				else if (vettore[1]==possibileMangiataDX) //controllo mangiata DX
+					secondo();
+				else if (vettore[1]==possibileMangiataSu) //controllo mangiata Su
+					secondo();
+				else if (vettore[1]==possibileMangiataGiu) //controllo mangiata Giu
+					secondo();
+				else if(vettore[1]==possibileMangiataSX2) //controllo mangiata SX2(cavallo)
+					secondo();
+				else if (vettore[1]==possibileMangiataDX2) //controllo mangiata DX2(cavallo)
+					secondo();
+				else if (vettore[1]==possibileMangiataSu2) //controllo mangiata Su2(cavallo)
+					secondo();
+				else if (vettore[1]==possibileMangiataGiu2) //controllo mangiata Giu2(cavallo)
+					secondo();
+				else
+					mossaNonConsentita();
+			}
+		}
+		
+		
+		
+		function controlloMossaReNero(i,j)
+		{
+			mossaPossibileRe=0;
+			iIniziale=i;
+			jIniziale=j;
+			controllo=1;
+			
+			var a=document.getElementById("img"+i+j+"").src;
+			var pos=a.lastIndexOf("/");
+			var srcRelativo=a.substring(pos+1);
+			if(srcRelativo=="vuota.png" || srcRelativo=="alfiere_b.png" || srcRelativo=="cavallo_b.png" || srcRelativo=="pedone_b.png" || srcRelativo=="re_b.png" || srcRelativo=="regina_b.png" || srcRelativo=="torre_b.png")
+				casiPossibili++;
+				
+			//controllo pedone giu sx
+			if(i<=7 && j>=2)
+			{
+				var a=document.getElementById("img"+(i+1)+(j-1)+"").src;
+				var pos=a.lastIndexOf("/");
+				var srcRelativo=a.substring(pos+1);
+				if(srcRelativo=="pedone_b.png")
+					{
+						mossaPossibileRe++;
+						casiFavorevoli++;
+					}
+			}
+			//controllo pedone giu dx
+			if(mossaPossibileRe==0)
+			{
+				if(i<=7 && j<=7)
+				{
+					var a=document.getElementById("img"+(i+1)+(j+1)+"").src;
+					var pos=a.lastIndexOf("/");
+					var srcRelativo=a.substring(pos+1);
+					if(srcRelativo=="pedone_b.png")
+						{
+							mossaPossibileRe++;
+							casiFavorevoli++;
+						}
+				}
+			}
+			
+			//controllo cavallo che fa 2 su 1 sx
+			if(mossaPossibileRe==0)
+			{
+				if(i<=6 && j<=7)
+				{
+					var a=document.getElementById("img"+(i+2)+(j+1)+"").src;
+					var pos=a.lastIndexOf("/");
+					var srcRelativo=a.substring(pos+1);
+					if(srcRelativo=="cavallo_b.png")
+						{
+							mossaPossibileRe++;
+							casiFavorevoli++;
+						}
+				}
+			}
+			//controllo cavallo che fa 2 su 1 dx
+			if(mossaPossibileRe==0)
+			{
+				if(i<=6 && j>=2)
+				{
+					var a=document.getElementById("img"+(i+2)+(j-1)+"").src;
+					var pos=a.lastIndexOf("/");
+					var srcRelativo=a.substring(pos+1);
+					if(srcRelativo=="cavallo_b.png")
+						{
+							mossaPossibileRe++;
+							casiFavorevoli++;
+						}
+				}
+			}
+			//controllo cavallo che fa 2 giu 1 sx
+			if(mossaPossibileRe==0)
+			{
+				if(i>=3 && j<=7)
+				{
+					var a=document.getElementById("img"+(i-2)+(j+1)+"").src;
+					var pos=a.lastIndexOf("/");
+					var srcRelativo=a.substring(pos+1);
+					if(srcRelativo=="cavallo_b.png")
+						{
+							mossaPossibileRe++;
+							casiFavorevoli++;
+						}
+				}
+			}
+			//controllo cavallo che fa 2 giu 1 dx
+			if(mossaPossibileRe==0)
+			{
+				if(i>=3 && j>=2)
+				{
+					var a=document.getElementById("img"+(i-2)+(j-1)+"").src;
+					var pos=a.lastIndexOf("/");
+					var srcRelativo=a.substring(pos+1);
+					if(srcRelativo=="cavallo_b.png")
+						{
+							mossaPossibileRe++;
+							casiFavorevoli++;
+						}
+				}
+			}
+			//controllo cavallo che fa 2 sx 1 su
+			if(mossaPossibileRe==0)
+			{
+				if(i<=7 && j<=6)
+				{
+					var a=document.getElementById("img"+(i+1)+(j+2)+"").src;
+					var pos=a.lastIndexOf("/");
+					var srcRelativo=a.substring(pos+1);
+					if(srcRelativo=="cavallo_b.png")
+						{
+							mossaPossibileRe++;
+							casiFavorevoli++;
+						}
+				}
+			}
+			//controllo cavallo che fa 2 sx 1 giu
+			if(mossaPossibileRe==0)
+			{
+				if(i>=2 && j<=6)
+				{
+					var a=document.getElementById("img"+(i-1)+(j+2)+"").src;
+					var pos=a.lastIndexOf("/");
+					var srcRelativo=a.substring(pos+1);
+					if(srcRelativo=="cavallo_b.png")
+						{
+							mossaPossibileRe++;
+							casiFavorevoli++;
+						}
+				}
+			}
+			//controllo cavallo che fa 2 dx 1 su
+			if(mossaPossibileRe==0)
+			{
+				if(i<=7 && j>=3)
+				{
+					var a=document.getElementById("img"+(i+1)+(j-2)+"").src;
+					var pos=a.lastIndexOf("/");
+					var srcRelativo=a.substring(pos+1);
+					if(srcRelativo=="cavallo_b.png")
+						{
+							mossaPossibileRe++;
+							casiFavorevoli++;
+						}
+				}
+			}
+			//controllo cavallo che fa 2 dx 1 giu
+			if(mossaPossibileRe==0)
+			{
+				if(i>=2 && j>=3)
+				{
+					var a=document.getElementById("img"+(i-1)+(j-2)+"").src;
+					var pos=a.lastIndexOf("/");
+					var srcRelativo=a.substring(pos+1);
+					if(srcRelativo=="cavallo_b.png")
+						{
+							mossaPossibileRe++;
+							casiFavorevoli++;
+						}
+				}
+			}
+			
+			//controllo torre che fa su
+			if(mossaPossibileRe==0)
+			{
+				do{
+					if(i<=7)
+					{
+						var a=document.getElementById("img"+(i+1)+j+"").src;
+						var pos=a.lastIndexOf("/");
+						var srcRelativo=a.substring(pos+1);
+						if(srcRelativo=="vuota.png")
+						{
+							i++;
+						}
+						else if(srcRelativo=="torre_b.png" || srcRelativo=="regina_b.png")
+							{
+								mossaPossibileRe++;
+								casiFavorevoli++;
+								controllo=0;
+							}
+						else
+							controllo=0;
+					}
+					else
+						controllo=0;
+				}while(controllo==1);
+				i=iIniziale;
+				controllo=1;
+			}
+
+			//controllo torre che fa giu
+			if(mossaPossibileRe==0)
+			{
+				do{
+					if(i>=2)
+					{
+						var a=document.getElementById("img"+(i-1)+j+"").src;
+						var pos=a.lastIndexOf("/");
+						var srcRelativo=a.substring(pos+1);
+						if(srcRelativo=="vuota.png")
+						{
+							i--;
+						}
+						else if(srcRelativo=="torre_b.png" || srcRelativo=="regina_b.png")
+							{
+								mossaPossibileRe++;
+								casiFavorevoli++;
+								controllo=0;
+							}
+						else
+							controllo=0;
+					}
+					else
+						controllo=0;
+				}while(controllo==1);
+				i=iIniziale;
+				controllo=1;
+			}	
+			
+			//controllo torre che fa sx
+			if(mossaPossibileRe==0)
+			{
+				do{
+					if(j<=7)
+					{
+						var a=document.getElementById("img"+i+(j+1)+"").src;
+						var pos=a.lastIndexOf("/");
+						var srcRelativo=a.substring(pos+1);
+						if(srcRelativo=="vuota.png")
+						{
+							j++;
+						}
+						else if(srcRelativo=="torre_b.png" || srcRelativo=="regina_b.png")
+							{
+								mossaPossibileRe++;
+								casiFavorevoli++;
+								controllo=0;
+							}
+						else
+							controllo=0;
+					}
+					else
+						controllo=0;
+				}while(controllo==1);
+				j=jIniziale;
+				controllo=1;
+			}
+
+			//controllo torre che fa dx
+			if(mossaPossibileRe==0)
+			{
+				do{
+					if(j>=2)
+					{
+						var a=document.getElementById("img"+i+(j-1)+"").src;
+						var pos=a.lastIndexOf("/");
+						var srcRelativo=a.substring(pos+1);
+						if(srcRelativo=="vuota.png")
+						{
+							j--;
+						}
+						else if(srcRelativo=="torre_b.png" || srcRelativo=="regina_b.png")
+							{
+								mossaPossibileRe++;
+								casiFavorevoli++;
+								controllo=0;
+							}
+						else
+							controllo=0;
+					}
+					else
+						controllo=0;
+				}while(controllo==1);
+				j=jIniziale;
+				controllo=1;
+			}	
+			
+			//controllo alfiere che fa su a sinistra
+			if(mossaPossibileRe==0)
+			{
+				do{
+					if(i<=7 && j<=7)
+					{
+						var a=document.getElementById("img"+(i+1)+(j+1)+"").src;
+						var pos=a.lastIndexOf("/");
+						var srcRelativo=a.substring(pos+1);
+						if(srcRelativo=="vuota.png")
+						{
+							i++;
+							j++;
+						}
+						else if(srcRelativo=="alfiere_b.png" || srcRelativo=="regina_b.png")
+							{
+								mossaPossibileRe++;
+								casiFavorevoli++;
+								controllo=0;
+							}
+						else
+							controllo=0;
+					}
+					else
+						controllo=0;
+				}while(controllo==1);
+				i=iIniziale;
+				j=jIniziale;
+				controllo=1;
+			}			
+			//controllo alfiere che fa giu a sinistra
+			if(mossaPossibileRe==0)
+			{
+				do{
+					if(i>=2 && j<=7)
+					{
+						var a=document.getElementById("img"+(i-1)+(j+1)+"").src;
+						var pos=a.lastIndexOf("/");
+						var srcRelativo=a.substring(pos+1);
+						if(srcRelativo=="vuota.png")
+						{
+							i--;
+							j++;
+						}
+						else if(srcRelativo=="alfiere_b.png" || srcRelativo=="regina_b.png")
+							{
+								mossaPossibileRe++;
+								casiFavorevoli++;
+								controllo=0;
+							}
+						else
+							controllo=0;
+					}
+					else
+						controllo=0;
+				}while(controllo==1);
+				i=iIniziale;
+				j=jIniziale;
+				controllo=1;
+			}
+			//controllo alfiere che fa su a destra
+			if(mossaPossibileRe==0)
+			{
+				do{
+					if(i<=7 && j>=2)
+					{
+						var a=document.getElementById("img"+(i+1)+(j-1)+"").src;
+						var pos=a.lastIndexOf("/");
+						var srcRelativo=a.substring(pos+1);
+						if(srcRelativo=="vuota.png")
+						{
+							i++;
+							j--;
+						}
+						else if(srcRelativo=="alfiere_b.png" || srcRelativo=="regina_b.png")
+							{
+								mossaPossibileRe++;
+								casiFavorevoli++;
+								controllo=0;
+							}
+						else
+							controllo=0;
+					}
+					else
+						controllo=0;
+				}while(controllo==1);
+				i=iIniziale;
+				j=jIniziale;
+				controllo=1;
+			}			
+			//controllo alfiere che fa giu a destra
+			if(mossaPossibileRe==0)
+			{
+				do{
+					if(i>=2 && j>=2)
+					{
+						var a=document.getElementById("img"+(i-1)+(j-1)+"").src;
+						var pos=a.lastIndexOf("/");
+						var srcRelativo=a.substring(pos+1);
+						if(srcRelativo=="vuota.png")
+						{
+							i--;
+							j--;
+						}
+						else if(srcRelativo=="alfiere_b.png" || srcRelativo=="regina_b.png")
+							{
+								mossaPossibileRe++;
+								casiFavorevoli++;
+								controllo=0;
+							}
+						else
+							controllo=0;
+					}
+					else
+						controllo=0;
+				}while(controllo==1);
+				i=iIniziale;
+				j=jIniziale;
+				controllo=1;
+			}
+			//controllo re che fa su sx
+			if(mossaPossibileRe==0)
+			{
+				if(i<=7 && j<=7)
+				{
+					var a=document.getElementById("img"+(i+1)+(j+1)+"").src;
+					var pos=a.lastIndexOf("/");
+					var srcRelativo=a.substring(pos+1);
+					if(srcRelativo=="re_b.png")
+						{
+							mossaPossibileRe++;
+							casiFavorevoli++;
+						}
+				}
+			}
+			//controllo re che fa su
+			if(mossaPossibileRe==0)
+			{
+				if(i<=7)
+				{
+					var a=document.getElementById("img"+(i+1)+j+"").src;
+					var pos=a.lastIndexOf("/");
+					var srcRelativo=a.substring(pos+1);
+					if(srcRelativo=="re_b.png")
+						{
+							mossaPossibileRe++;
+							casiFavorevoli++;
+						}
+				}
+			}
+			//controllo re che fa su dx
+			if(mossaPossibileRe==0)
+			{
+				if(i<=7 && j>=2)
+				{
+					var a=document.getElementById("img"+(i+1)+(j-1)+"").src;
+					var pos=a.lastIndexOf("/");
+					var srcRelativo=a.substring(pos+1);
+					if(srcRelativo=="re_b.png")
+						{
+							mossaPossibileRe++;
+							casiFavorevoli++;
+						}
+				}
+			}
+			//controllo re che fa dx
+			if(mossaPossibileRe==0)
+			{
+				if(j>=2)
+				{
+					var a=document.getElementById("img"+i+(j-1)+"").src;
+					var pos=a.lastIndexOf("/");
+					var srcRelativo=a.substring(pos+1);
+					if(srcRelativo=="re_b.png")
+						{
+							mossaPossibileRe++;
+							casiFavorevoli++;
+						}
+				}
+			}
+			//controllo re che fa giu dx
+			if(mossaPossibileRe==0)
+			{
+				if(i>=2 && j>=2)
+				{
+					var a=document.getElementById("img"+(i-1)+(j-1)+"").src;
+					var pos=a.lastIndexOf("/");
+					var srcRelativo=a.substring(pos+1);
+					if(srcRelativo=="re_b.png")
+						{
+							mossaPossibileRe++;
+							casiFavorevoli++;
+						}
+				}
+			}
+			//controllo re che fa giu
+			if(mossaPossibileRe==0)
+			{
+				if(i>=2)
+				{
+					var a=document.getElementById("img"+(i-1)+j+"").src;
+					var pos=a.lastIndexOf("/");
+					var srcRelativo=a.substring(pos+1);
+					if(srcRelativo=="re_b.png")
+						{
+							mossaPossibileRe++;
+							casiFavorevoli++;
+						}
+				}
+			}
+			//controllo re che fa giu sx
+			if(mossaPossibileRe==0)
+			{
+				if(i>=2 && j<=7)
+				{
+					var a=document.getElementById("img"+(i-1)+(j+1)+"").src;
+					var pos=a.lastIndexOf("/");
+					var srcRelativo=a.substring(pos+1);
+					if(srcRelativo=="re_b.png")
+						{
+							mossaPossibileRe++;
+							casiFavorevoli++;
+						}
+				}
+			}
+			//controllo re che fa sx
+			if(mossaPossibileRe==0)
+			{
+				if(j<=7)
+				{
+					var a=document.getElementById("img"+i+(j+1)+"").src;
+					var pos=a.lastIndexOf("/");
+					var srcRelativo=a.substring(pos+1);
+					if(srcRelativo=="re_b.png")
+						{
+							mossaPossibileRe++;
+							casiFavorevoli++;
+						}
+				}
+			}
+		}	
+		
+		function reNero(i,j)
+		{
+			if(vettore[0]=="0")	//primo oggetto selezionato : mittente
+			{
+				if(turno==0)  //se tocca al nero
+				{
+					vettore[0]=""+i+j+"";
+					vettore[2]=document.getElementById("td"+vettore[0]+"").style.backgroundColor;
+					document.getElementById("td"+vettore[0]+"").style.backgroundColor="red";
+					
+					//possibili movimenti
+					//movimento in su a sinistra
+					if(i>=2 && j>=2)
+					{					
+						var a=document.getElementById("img"+(i-1)+(j-1)+"").src;
+						var pos=a.lastIndexOf("/");
+						var srcRelativo=a.substring(pos+1);
+						
+						controlloMossaReNero((i-1),(j-1));	//controllo se la mossa porta il re ad essere mangiato
+							
+						if(srcRelativo=="vuota.png" && mossaPossibileRe==0)	//se non c'e' un oggetto
+						{
+							possibileMovimento[contaMosse]=""+(i-1)+(j-1)+"";
+							contaMosse++;
+						}
+						else if((srcRelativo=="alfiere_b.png" || srcRelativo=="cavallo_b.png" || srcRelativo=="pedone_b.png" || srcRelativo=="re_b.png" || srcRelativo=="regina_b.png" || srcRelativo=="torre_b.png") && mossaPossibileRe==0)	//se c'e' un bianco
+						{
+							possibileMangiataSu=""+(i-1)+(j-1)+"";
+							document.getElementById("td"+possibileMangiataSu+"").style.backgroundColor="green";
+						}
+					}
+					//movimento in su
+					if(i>=2)
+					{					
+						var a=document.getElementById("img"+(i-1)+j+"").src;
+						var pos=a.lastIndexOf("/");
+						var srcRelativo=a.substring(pos+1);
+						
+						controlloMossaReNero((i-1),j);	//controllo se la mossa porta il re ad essere mangiato
+							
+						if(srcRelativo=="vuota.png" && mossaPossibileRe==0)	//se non c'e' un oggetto
+						{
+							possibileMovimento[contaMosse]=""+(i-1)+j+"";
+							contaMosse++;
+						}
+						else if((srcRelativo=="alfiere_b.png" || srcRelativo=="cavallo_b.png" || srcRelativo=="pedone_b.png" || srcRelativo=="re_b.png" || srcRelativo=="regina_b.png" || srcRelativo=="torre_b.png") && mossaPossibileRe==0)	//se c'e' un bianco
+						{
+							possibileMangiataSu2=""+(i-1)+j+"";
+							document.getElementById("td"+possibileMangiataSu2+"").style.backgroundColor="green";
+						}
+					}
+					//movimento in su a destra
+					if(i>=2 && j<=7)
+					{					
+						var a=document.getElementById("img"+(i-1)+(j+1)+"").src;
+						var pos=a.lastIndexOf("/");
+						var srcRelativo=a.substring(pos+1);
+						
+						controlloMossaReNero((i-1),(j+1));	//controllo se la mossa porta il re ad essere mangiato
+							
+						if(srcRelativo=="vuota.png" && mossaPossibileRe==0)	//se non c'e' un oggetto
+						{
+							possibileMovimento[contaMosse]=""+(i-1)+(j+1)+"";
+							contaMosse++;
+						}
+						else if((srcRelativo=="alfiere_b.png" || srcRelativo=="cavallo_b.png" || srcRelativo=="pedone_b.png" || srcRelativo=="re_b.png" || srcRelativo=="regina_b.png" || srcRelativo=="torre_b.png") && mossaPossibileRe==0)	//se c'e' un bianco
+						{
+							possibileMangiataDX=""+(i-1)+(j+1)+"";
+							document.getElementById("td"+possibileMangiataDX+"").style.backgroundColor="green";
+						}
+					}
+					//movimento a destra
+					if(j<=7)
+					{					
+						var a=document.getElementById("img"+i+(j+1)+"").src;
+						var pos=a.lastIndexOf("/");
+						var srcRelativo=a.substring(pos+1);
+						
+						controlloMossaReNero(i,(j+1));	//controllo se la mossa porta il re ad essere mangiato
+							
+						if(srcRelativo=="vuota.png" && mossaPossibileRe==0)	//se non c'e' un oggetto
+						{
+							possibileMovimento[contaMosse]=""+i+(j+1)+"";
+							contaMosse++;
+						}
+						else if((srcRelativo=="alfiere_b.png" || srcRelativo=="cavallo_b.png" || srcRelativo=="pedone_b.png" || srcRelativo=="re_b.png" || srcRelativo=="regina_b.png" || srcRelativo=="torre_b.png") && mossaPossibileRe==0)	//se c'e' un bianco
+						{
+							possibileMangiataDX2=""+i+(j+1)+"";
+							document.getElementById("td"+possibileMangiataDX2+"").style.backgroundColor="green";
+						}
+					}
+					//movimento in giu a destra
+					if(i<=7 && j<=7)
+					{					
+						var a=document.getElementById("img"+(i+1)+(j+1)+"").src;
+						var pos=a.lastIndexOf("/");
+						var srcRelativo=a.substring(pos+1);
+						
+						controlloMossaReNero((i+1),(j+1));	//controllo se la mossa porta il re ad essere mangiato
+							
+						if(srcRelativo=="vuota.png" && mossaPossibileRe==0)	//se non c'e' un oggetto
+						{
+							possibileMovimento[contaMosse]=""+(i+1)+(j+1)+"";
+							contaMosse++;
+						}
+						else if((srcRelativo=="alfiere_b.png" || srcRelativo=="cavallo_b.png" || srcRelativo=="pedone_b.png" || srcRelativo=="re_b.png" || srcRelativo=="regina_b.png" || srcRelativo=="torre_b.png") && mossaPossibileRe==0)	//se c'e' un bianco
+						{
+							possibileMangiataGiu=""+(i+1)+(j+1)+"";
+							document.getElementById("td"+possibileMangiataGiu+"").style.backgroundColor="green";
+						}
+					}
+					//movimento in giu
+					if(i<=7)
+					{					
+						var a=document.getElementById("img"+(i+1)+j+"").src;
+						var pos=a.lastIndexOf("/");
+						var srcRelativo=a.substring(pos+1);
+						
+						controlloMossaReNero((i+1),j);	//controllo se la mossa porta il re ad essere mangiato
+							
+						if(srcRelativo=="vuota.png" && mossaPossibileRe==0)	//se non c'e' un oggetto
+						{
+							possibileMovimento[contaMosse]=""+(i+1)+j+"";
+							contaMosse++;
+						}
+						else if((srcRelativo=="alfiere_b.png" || srcRelativo=="cavallo_b.png" || srcRelativo=="pedone_b.png" || srcRelativo=="re_b.png" || srcRelativo=="regina_b.png" || srcRelativo=="torre_b.png") && mossaPossibileRe==0)	//se c'e' un bianco
+						{
+							possibileMangiataGiu2=""+(i+1)+j+"";
+							document.getElementById("td"+possibileMangiataGiu2+"").style.backgroundColor="green";
+						}
+					}
+					//movimento in giu a sinistra
+					if(i<=7 && j>=2)
+					{					
+						var a=document.getElementById("img"+(i+1)+(j-1)+"").src;
+						var pos=a.lastIndexOf("/");
+						var srcRelativo=a.substring(pos+1);
+						
+						controlloMossaReNero((i+1),(j-1));	//controllo se la mossa porta il re ad essere mangiato
+							
+						if(srcRelativo=="vuota.png" && mossaPossibileRe==0)	//se non c'e' un oggetto
+						{
+							possibileMovimento[contaMosse]=""+(i+1)+(j-1)+"";
+							contaMosse++;
+						}
+						else if((srcRelativo=="alfiere_b.png" || srcRelativo=="cavallo_b.png" || srcRelativo=="pedone_b.png" || srcRelativo=="re_b.png" || srcRelativo=="regina_b.png" || srcRelativo=="torre_b.png") && mossaPossibileRe==0)	//se c'e' un bianco
+						{
+							possibileMangiataSX=""+(i+1)+(j-1)+"";
+							document.getElementById("td"+possibileMangiataSX+"").style.backgroundColor="green";
+						}
+					}
+					//movimento a sinistra
+					if(j>=2)
+					{					
+						var a=document.getElementById("img"+i+(j-1)+"").src;
+						var pos=a.lastIndexOf("/");
+						var srcRelativo=a.substring(pos+1);
+						
+						controlloMossaReNero(i,(j-1));	//controllo se la mossa porta il re ad essere mangiato
+							
+						if(srcRelativo=="vuota.png" && mossaPossibileRe==0)	//se non c'e' un oggetto
+						{
+							possibileMovimento[contaMosse]=""+i+(j-1)+"";
+							contaMosse++;
+						}
+						else if((srcRelativo=="alfiere_b.png" || srcRelativo=="cavallo_b.png" || srcRelativo=="pedone_b.png" || srcRelativo=="re_b.png" || srcRelativo=="regina_b.png" || srcRelativo=="torre_b.png") && mossaPossibileRe==0)	//se c'e' un bianco
+						{
+							possibileMangiataSX2=""+i+(j-1)+"";
+							document.getElementById("td"+possibileMangiataSX2+"").style.backgroundColor="green";
+						}
+					}
+					
+					//possibile arrocco dx
+					if(contaMossePerArroccoNeroDestra==0)
+					{
+						arroccoDestra=0;
+						var a=document.getElementById("img"+i+(j+1)+"").src;	//cella [1,6]
+						var pos=a.lastIndexOf("/");
+						var srcRelativo=a.substring(pos+1);
+						
+						if(srcRelativo=="vuota.png")	//se non c'e' un oggetto
+						{
+							arroccoDestra++;
+						}
+						var a=document.getElementById("img"+i+(j+2)+"").src;	//cella [1,7]
+						var pos=a.lastIndexOf("/");
+						var srcRelativo=a.substring(pos+1);
+						
+						if(srcRelativo=="vuota.png")	//se non c'e' un oggetto
+						{
+							arroccoDestra++;
+						}
+						var a=document.getElementById("img"+i+(j+3)+"").src;	//cella [1,8]
+						var pos=a.lastIndexOf("/");
+						var srcRelativo=a.substring(pos+1);
+						
+						if(srcRelativo=="torre_n.png")	//se non c'e' un oggetto
+						{
+							arroccoDestra++;
+						}
+						
+						if(arroccoDestra==3) //arrocco destra
+						{
+							arroccoNeroDestraPossibile=1;
+							document.getElementById("td17").style.backgroundColor="yellow";	//segnala arrocco
+						}
+					}
+					
+					//possibile arrocco sx
+					if(contaMossePerArroccoNeroSinistra==0)
+					{
+						arroccoSinistra=0;
+						var a=document.getElementById("img"+i+(j-1)+"").src;	//cella [1,4]
+						var pos=a.lastIndexOf("/");
+						var srcRelativo=a.substring(pos+1);
+						
+						if(srcRelativo=="vuota.png")	//se non c'e' un oggetto
+						{
+							arroccoSinistra++;
+						}
+						var a=document.getElementById("img"+i+(j-2)+"").src;	//cella [1,3]
+						var pos=a.lastIndexOf("/");
+						var srcRelativo=a.substring(pos+1);
+						
+						if(srcRelativo=="vuota.png")	//se non c'e' un oggetto
+						{
+							arroccoSinistra++;
+						}
+						var a=document.getElementById("img"+i+(j-3)+"").src;	//cella [1,2]
+						var pos=a.lastIndexOf("/");
+						var srcRelativo=a.substring(pos+1);
+						
+						if(srcRelativo=="vuota.png")	//se non c'e' un oggetto
+						{
+							arroccoSinistra++;
+						}
+						var a=document.getElementById("img"+i+(j-4)+"").src;	//cella [1,1]
+						var pos=a.lastIndexOf("/");
+						var srcRelativo=a.substring(pos+1);
+						
+						if(srcRelativo=="torre_n.png")	//se non c'e' un oggetto
+						{
+							arroccoSinistra++;
+						}
+						
+						if(arroccoSinistra==4) //arrocco sinistra
+						{
+							arroccoNeroSinistraPossibile=1;
+							document.getElementById("td12").style.backgroundColor="yellow";	//segnala arrocco
+						}
+					}
+					
+					
+					for(var contatore=0;contatore<contaMosse;contatore++)
+						document.getElementById("td"+possibileMovimento[contatore]+"").style.backgroundColor="lightblue";
+					turno=1;
+				}
+				else
+					alert("Tocca all'altro giocatore!");
+			}			
+			else //secondo oggetto selezionato : ricevente
+			{
+				document.getElementById("td"+vettore[0]+"").style.backgroundColor=vettore[2];
+				vettore[1]=""+i+j+"";
+								
+				//controllo movimento
+				for(var contatore=0;contatore<contaMosse;contatore++)
+				{
+					if(vettore[1]==possibileMovimento[contatore])
+					{
+						secondo();
+						break;
+					}
+				}
+				if(vettore[1]==possibileMangiataSX) //controllo mangiata SX
+					secondo();
+				else if (vettore[1]==possibileMangiataDX) //controllo mangiata DX
+					secondo();
+				else if (vettore[1]==possibileMangiataSu) //controllo mangiata Su
+					secondo();
+				else if (vettore[1]==possibileMangiataGiu) //controllo mangiata Giu
+					secondo();
+				else if(vettore[1]==possibileMangiataSX2) //controllo mangiata SX2(cavallo)
+					secondo();
+				else if (vettore[1]==possibileMangiataDX2) //controllo mangiata DX2(cavallo)
+					secondo();
+				else if (vettore[1]==possibileMangiataSu2) //controllo mangiata Su2(cavallo)
+					secondo();
+				else if (vettore[1]==possibileMangiataGiu2) //controllo mangiata Giu2(cavallo)
+					secondo();
+				else
+					mossaNonConsentita();
+			}
+		}
+		
+		function controlloMossaReBianco(i,j)
+		{
+			mossaPossibileRe=0;
+			iIniziale=i;
+			jIniziale=j;
+			controllo=1;
+			
+			var a=document.getElementById("img"+i+j+"").src;
+			var pos=a.lastIndexOf("/");
+			var srcRelativo=a.substring(pos+1);
+			if(srcRelativo=="vuota.png" || srcRelativo=="alfiere_n.png" || srcRelativo=="cavallo_n.png" || srcRelativo=="pedone_n.png" || srcRelativo=="re_n.png" || srcRelativo=="regina_n.png" || srcRelativo=="torre_n.png")
+				casiPossibili++;
+				
+			//controllo pedone su sx
+			if(i>=2 && j>=2)
+			{
+				var a=document.getElementById("img"+(i-1)+(j-1)+"").src;
+				var pos=a.lastIndexOf("/");
+				var srcRelativo=a.substring(pos+1);
+				if(srcRelativo=="pedone_n.png")
+					{
+						mossaPossibileRe++;
+						casiFavorevoli++;
+					}
+			}
+			//controllo pedone su dx
+			if(mossaPossibileRe==0)
+			{
+				if(i>=2 && j<=7)
+				{
+					var a=document.getElementById("img"+(i-1)+(j+1)+"").src;
+					var pos=a.lastIndexOf("/");
+					var srcRelativo=a.substring(pos+1);
+					if(srcRelativo=="pedone_n.png")
+						{
+							mossaPossibileRe++;
+							casiFavorevoli++;
+						}
+				}
+			}
+			
+			//controllo cavallo che fa 2 su 1 sx
+			if(mossaPossibileRe==0)
+			{
+				if(i<=6 && j<=7)
+				{
+					var a=document.getElementById("img"+(i+2)+(j+1)+"").src;
+					var pos=a.lastIndexOf("/");
+					var srcRelativo=a.substring(pos+1);
+					if(srcRelativo=="cavallo_n.png")
+						{
+							mossaPossibileRe++;
+							casiFavorevoli++;
+						}
+				}
+			}
+			//controllo cavallo che fa 2 su 1 dx
+			if(mossaPossibileRe==0)
+			{
+				if(i<=6 && j>=2)
+				{
+					var a=document.getElementById("img"+(i+2)+(j-1)+"").src;
+					var pos=a.lastIndexOf("/");
+					var srcRelativo=a.substring(pos+1);
+					if(srcRelativo=="cavallo_n.png")
+						{
+							mossaPossibileRe++;
+							casiFavorevoli++;
+						}
+				}
+			}
+			//controllo cavallo che fa 2 giu 1 sx
+			if(mossaPossibileRe==0)
+			{
+				if(i>=3 && j<=7)
+				{
+					var a=document.getElementById("img"+(i-2)+(j+1)+"").src;
+					var pos=a.lastIndexOf("/");
+					var srcRelativo=a.substring(pos+1);
+					if(srcRelativo=="cavallo_n.png")
+						{
+							mossaPossibileRe++;
+							casiFavorevoli++;
+						}
+				}
+			}
+			//controllo cavallo che fa 2 giu 1 dx
+			if(mossaPossibileRe==0)
+			{
+				if(i>=3 && j>=2)
+				{
+					var a=document.getElementById("img"+(i-2)+(j-1)+"").src;
+					var pos=a.lastIndexOf("/");
+					var srcRelativo=a.substring(pos+1);
+					if(srcRelativo=="cavallo_n.png")
+						{
+							mossaPossibileRe++;
+							casiFavorevoli++;
+						}
+				}
+			}
+			//controllo cavallo che fa 2 sx 1 su
+			if(mossaPossibileRe==0)
+			{
+				if(i<=7 && j<=6)
+				{
+					var a=document.getElementById("img"+(i+1)+(j+2)+"").src;
+					var pos=a.lastIndexOf("/");
+					var srcRelativo=a.substring(pos+1);
+					if(srcRelativo=="cavallo_n.png")
+						{
+							mossaPossibileRe++;
+							casiFavorevoli++;
+						}
+				}
+			}
+			//controllo cavallo che fa 2 sx 1 giu
+			if(mossaPossibileRe==0)
+			{
+				if(i>=2 && j<=6)
+				{
+					var a=document.getElementById("img"+(i-1)+(j+2)+"").src;
+					var pos=a.lastIndexOf("/");
+					var srcRelativo=a.substring(pos+1);
+					if(srcRelativo=="cavallo_n.png")
+						{
+							mossaPossibileRe++;
+							casiFavorevoli++;
+						}
+				}
+			}
+			//controllo cavallo che fa 2 dx 1 su
+			if(mossaPossibileRe==0)
+			{
+				if(i<=7 && j>=3)
+				{
+					var a=document.getElementById("img"+(i+1)+(j-2)+"").src;
+					var pos=a.lastIndexOf("/");
+					var srcRelativo=a.substring(pos+1);
+					if(srcRelativo=="cavallo_n.png")
+						{
+							mossaPossibileRe++;
+							casiFavorevoli++;
+						}
+				}
+			}
+			//controllo cavallo che fa 2 dx 1 giu
+			if(mossaPossibileRe==0)
+			{
+				if(i>=2 && j>=3)
+				{
+					var a=document.getElementById("img"+(i-1)+(j-2)+"").src;
+					var pos=a.lastIndexOf("/");
+					var srcRelativo=a.substring(pos+1);
+					if(srcRelativo=="cavallo_n.png")
+						{
+							mossaPossibileRe++;
+							casiFavorevoli++;
+						}
+				}
+			}
+			
+			//controllo torre che fa su
+			if(mossaPossibileRe==0)
+			{
+				do{
+					if(i<=7)
+					{
+						var a=document.getElementById("img"+(i+1)+j+"").src;
+						var pos=a.lastIndexOf("/");
+						var srcRelativo=a.substring(pos+1);
+						if(srcRelativo=="vuota.png")
+						{
+							i++;
+						}
+						else if(srcRelativo=="torre_n.png" || srcRelativo=="regina_n.png")
+							{
+								mossaPossibileRe++;
+								casiFavorevoli++;
+								controllo=0;
+							}
+						else
+							controllo=0;
+					}
+					else
+						controllo=0;
+				}while(controllo==1);
+				i=iIniziale;
+				controllo=1;
+			}
+
+			//controllo torre che fa giu
+			if(mossaPossibileRe==0)
+			{
+				do{
+					if(i>=2)
+					{
+						var a=document.getElementById("img"+(i-1)+j+"").src;
+						var pos=a.lastIndexOf("/");
+						var srcRelativo=a.substring(pos+1);
+						if(srcRelativo=="vuota.png")
+						{
+							i--;
+						}
+						else if(srcRelativo=="torre_n.png" || srcRelativo=="regina_n.png")
+							{
+								mossaPossibileRe++;
+								casiFavorevoli++;
+								controllo=0;
+							}
+						else
+							controllo=0;
+					}
+					else
+						controllo=0;
+				}while(controllo==1);
+				i=iIniziale;
+				controllo=1;
+			}	
+			
+			//controllo torre che fa sx
+			if(mossaPossibileRe==0)
+			{
+				do{
+					if(j<=7)
+					{
+						var a=document.getElementById("img"+i+(j+1)+"").src;
+						var pos=a.lastIndexOf("/");
+						var srcRelativo=a.substring(pos+1);
+						if(srcRelativo=="vuota.png")
+						{
+							j++;
+						}
+						else if(srcRelativo=="torre_n.png" || srcRelativo=="regina_n.png")
+							{
+								mossaPossibileRe++;
+								casiFavorevoli++;
+								controllo=0;
+							}
+						else
+							controllo=0;
+					}
+					else
+						controllo=0;
+				}while(controllo==1);
+				j=jIniziale;
+				controllo=1;
+			}
+
+			//controllo torre che fa dx
+			if(mossaPossibileRe==0)
+			{
+				do{
+					if(j>=2)
+					{
+						var a=document.getElementById("img"+i+(j-1)+"").src;
+						var pos=a.lastIndexOf("/");
+						var srcRelativo=a.substring(pos+1);
+						if(srcRelativo=="vuota.png")
+						{
+							j--;
+						}
+						else if(srcRelativo=="torre_n.png" || srcRelativo=="regina_n.png")
+							{
+								mossaPossibileRe++;
+								casiFavorevoli++;
+								controllo=0;
+							}
+						else
+							controllo=0;
+					}
+					else
+						controllo=0;
+				}while(controllo==1);
+				j=jIniziale;
+				controllo=1;
+			}	
+			
+			//controllo alfiere che fa su a sinistra
+			if(mossaPossibileRe==0)
+			{
+				do{
+					if(i<=7 && j<=7)
+					{
+						var a=document.getElementById("img"+(i+1)+(j+1)+"").src;
+						var pos=a.lastIndexOf("/");
+						var srcRelativo=a.substring(pos+1);
+						if(srcRelativo=="vuota.png")
+						{
+							i++;
+							j++;
+						}
+						else if(srcRelativo=="alfiere_n.png" || srcRelativo=="regina_n.png")
+							{
+								mossaPossibileRe++;
+								casiFavorevoli++;
+								controllo=0;
+							}
+						else
+							controllo=0;
+					}
+					else
+						controllo=0;
+				}while(controllo==1);
+				i=iIniziale;
+				j=jIniziale;
+				controllo=1;
+			}			
+			//controllo alfiere che fa giu a sinistra
+			if(mossaPossibileRe==0)
+			{
+				do{
+					if(i>=2 && j<=7)
+					{
+						var a=document.getElementById("img"+(i-1)+(j+1)+"").src;
+						var pos=a.lastIndexOf("/");
+						var srcRelativo=a.substring(pos+1);
+						if(srcRelativo=="vuota.png")
+						{
+							i--;
+							j++;
+						}
+						else if(srcRelativo=="alfiere_n.png" || srcRelativo=="regina_n.png")
+							{
+								mossaPossibileRe++;
+								casiFavorevoli++;
+								controllo=0;
+							}
+						else
+							controllo=0;
+					}
+					else
+						controllo=0;
+				}while(controllo==1);
+				i=iIniziale;
+				j=jIniziale;
+				controllo=1;
+			}
+			//controllo alfiere che fa su a destra
+			if(mossaPossibileRe==0)
+			{
+				do{
+					if(i<=7 && j>=2)
+					{
+						var a=document.getElementById("img"+(i+1)+(j-1)+"").src;
+						var pos=a.lastIndexOf("/");
+						var srcRelativo=a.substring(pos+1);
+						if(srcRelativo=="vuota.png")
+						{
+							i++;
+							j--;
+						}
+						else if(srcRelativo=="alfiere_n.png" || srcRelativo=="regina_n.png")
+							{
+								mossaPossibileRe++;
+								casiFavorevoli++;
+								controllo=0;
+							}
+						else
+							controllo=0;
+					}
+					else
+						controllo=0;
+				}while(controllo==1);
+				i=iIniziale;
+				j=jIniziale;
+				controllo=1;
+			}			
+			//controllo alfiere che fa giu a destra
+			if(mossaPossibileRe==0)
+			{
+				do{
+					if(i>=2 && j>=2)
+					{
+						var a=document.getElementById("img"+(i-1)+(j-1)+"").src;
+						var pos=a.lastIndexOf("/");
+						var srcRelativo=a.substring(pos+1);
+						if(srcRelativo=="vuota.png")
+						{
+							i--;
+							j--;
+						}
+						else if(srcRelativo=="alfiere_n.png" || srcRelativo=="regina_n.png")
+							{
+								mossaPossibileRe++;
+								casiFavorevoli++;
+								controllo=0;
+							}
+						else
+							controllo=0;
+					}
+					else
+						controllo=0;
+				}while(controllo==1);
+				i=iIniziale;
+				j=jIniziale;
+				controllo=1;
+			}
+			//controllo re che fa su sx
+			if(mossaPossibileRe==0)
+			{
+				if(i<=7 && j<=7)
+				{
+					var a=document.getElementById("img"+(i+1)+(j+1)+"").src;
+					var pos=a.lastIndexOf("/");
+					var srcRelativo=a.substring(pos+1);
+					if(srcRelativo=="re_n.png")
+						{
+							mossaPossibileRe++;
+							casiFavorevoli++;
+						}
+				}
+			}
+			//controllo re che fa su
+			if(mossaPossibileRe==0)
+			{
+				if(i<=7)
+				{
+					var a=document.getElementById("img"+(i+1)+j+"").src;
+					var pos=a.lastIndexOf("/");
+					var srcRelativo=a.substring(pos+1);
+					if(srcRelativo=="re_n.png")
+						{
+							mossaPossibileRe++;
+							casiFavorevoli++;
+						}
+				}
+			}
+			//controllo re che fa su dx
+			if(mossaPossibileRe==0)
+			{
+				if(i<=7 && j>=2)
+				{
+					var a=document.getElementById("img"+(i+1)+(j-1)+"").src;
+					var pos=a.lastIndexOf("/");
+					var srcRelativo=a.substring(pos+1);
+					if(srcRelativo=="re_n.png")
+						{
+							mossaPossibileRe++;
+							casiFavorevoli++;
+						}
+				}
+			}
+			//controllo re che fa dx
+			if(mossaPossibileRe==0)
+			{
+				if(j>=2)
+				{
+					var a=document.getElementById("img"+i+(j-1)+"").src;
+					var pos=a.lastIndexOf("/");
+					var srcRelativo=a.substring(pos+1);
+					if(srcRelativo=="re_n.png")
+						{
+							mossaPossibileRe++;
+							casiFavorevoli++;
+						}
+				}
+			}
+			//controllo re che fa giu dx
+			if(mossaPossibileRe==0)
+			{
+				if(i>=2 && j>=2)
+				{
+					var a=document.getElementById("img"+(i-1)+(j-1)+"").src;
+					var pos=a.lastIndexOf("/");
+					var srcRelativo=a.substring(pos+1);
+					if(srcRelativo=="re_n.png")
+						{
+							mossaPossibileRe++;
+							casiFavorevoli++;
+						}
+				}
+			}
+			//controllo re che fa giu
+			if(mossaPossibileRe==0)
+			{
+				if(i>=2)
+				{
+					var a=document.getElementById("img"+(i-1)+j+"").src;
+					var pos=a.lastIndexOf("/");
+					var srcRelativo=a.substring(pos+1);
+					if(srcRelativo=="re_n.png")
+						{
+							mossaPossibileRe++;
+							casiFavorevoli++;
+						}
+				}
+			}
+			//controllo re che fa giu sx
+			if(mossaPossibileRe==0)
+			{
+				if(i>=2 && j<=7)
+				{
+					var a=document.getElementById("img"+(i-1)+(j+1)+"").src;
+					var pos=a.lastIndexOf("/");
+					var srcRelativo=a.substring(pos+1);
+					if(srcRelativo=="re_n.png")
+						{
+							mossaPossibileRe++;
+							casiFavorevoli++;
+						}
+				}
+			}
+			//controllo re che fa sx
+			if(mossaPossibileRe==0)
+			{
+				if(j<=7)
+				{
+					var a=document.getElementById("img"+i+(j+1)+"").src;
+					var pos=a.lastIndexOf("/");
+					var srcRelativo=a.substring(pos+1);
+					if(srcRelativo=="re_n.png")
+						{
+							mossaPossibileRe++;
+							casiFavorevoli++;
+						}
+				}
+			}
+		}
+		
+		function reBianco(i,j)
+		{
+			if(vettore[0]=="0")	//primo oggetto selezionato : mittente
+			{
+				if(turno==1)  //se tocca al bianco
+				{
+					vettore[0]=""+i+j+"";
+					vettore[2]=document.getElementById("td"+vettore[0]+"").style.backgroundColor;
+					document.getElementById("td"+vettore[0]+"").style.backgroundColor="red";
+					
+					//possibili movimenti
+					//movimento in su a sinistra
+					if(i>=2 && j>=2)
+					{					
+						var a=document.getElementById("img"+(i-1)+(j-1)+"").src;
+						var pos=a.lastIndexOf("/");
+						var srcRelativo=a.substring(pos+1);
+						
+						controlloMossaReBianco((i-1),(j-1));	//controllo se la mossa porta il re ad essere mangiato
+							
+						if(srcRelativo=="vuota.png" && mossaPossibileRe==0)	//se non c'e' un oggetto
+						{
+							possibileMovimento[contaMosse]=""+(i-1)+(j-1)+"";
+							contaMosse++;
+						}
+						else if((srcRelativo=="alfiere_n.png" || srcRelativo=="cavallo_n.png" || srcRelativo=="pedone_n.png" || srcRelativo=="re_n.png" || srcRelativo=="regina_n.png" || srcRelativo=="torre_n.png") && mossaPossibileRe==0)
+						{
+							possibileMangiataSu=""+(i-1)+(j-1)+"";
+							document.getElementById("td"+possibileMangiataSu+"").style.backgroundColor="green";
+						}
+					}
+					//movimento in su
+					if(i>=2)
+					{					
+						var a=document.getElementById("img"+(i-1)+j+"").src;
+						var pos=a.lastIndexOf("/");
+						var srcRelativo=a.substring(pos+1);
+						
+						controlloMossaReBianco((i-1),j);	//controllo se la mossa porta il re ad essere mangiato
+							
+						if(srcRelativo=="vuota.png" && mossaPossibileRe==0)	//se non c'e' un oggetto
+						{
+							possibileMovimento[contaMosse]=""+(i-1)+j+"";
+							contaMosse++;
+						}
+						else if((srcRelativo=="alfiere_n.png" || srcRelativo=="cavallo_n.png" || srcRelativo=="pedone_n.png" || srcRelativo=="re_n.png" || srcRelativo=="regina_n.png" || srcRelativo=="torre_n.png") && mossaPossibileRe==0)
+						{
+							possibileMangiataSu2=""+(i-1)+j+"";
+							document.getElementById("td"+possibileMangiataSu2+"").style.backgroundColor="green";
+						}
+					}
+					//movimento in su a destra
+					if(i>=2 && j<=7)
+					{					
+						var a=document.getElementById("img"+(i-1)+(j+1)+"").src;
+						var pos=a.lastIndexOf("/");
+						var srcRelativo=a.substring(pos+1);
+						
+						controlloMossaReBianco((i-1),(j+1));	//controllo se la mossa porta il re ad essere mangiato
+							
+						if(srcRelativo=="vuota.png" && mossaPossibileRe==0)	//se non c'e' un oggetto
+						{
+							possibileMovimento[contaMosse]=""+(i-1)+(j+1)+"";
+							contaMosse++;
+						}
+						else if((srcRelativo=="alfiere_n.png" || srcRelativo=="cavallo_n.png" || srcRelativo=="pedone_n.png" || srcRelativo=="re_n.png" || srcRelativo=="regina_n.png" || srcRelativo=="torre_n.png") && mossaPossibileRe==0)
+						{
+							possibileMangiataDX=""+(i-1)+(j+1)+"";
+							document.getElementById("td"+possibileMangiataDX+"").style.backgroundColor="green";
+						}
+					}
+					//movimento a destra
+					if(j<=7)
+					{					
+						var a=document.getElementById("img"+i+(j+1)+"").src;
+						var pos=a.lastIndexOf("/");
+						var srcRelativo=a.substring(pos+1);
+						
+						controlloMossaReBianco(i,(j+1));	//controllo se la mossa porta il re ad essere mangiato
+							
+						if(srcRelativo=="vuota.png" && mossaPossibileRe==0)	//se non c'e' un oggetto
+						{
+							possibileMovimento[contaMosse]=""+i+(j+1)+"";
+							contaMosse++;
+						}
+						else if((srcRelativo=="alfiere_n.png" || srcRelativo=="cavallo_n.png" || srcRelativo=="pedone_n.png" || srcRelativo=="re_n.png" || srcRelativo=="regina_n.png" || srcRelativo=="torre_n.png") && mossaPossibileRe==0)
+						{
+							possibileMangiataDX2=""+i+(j+1)+"";
+							document.getElementById("td"+possibileMangiataDX2+"").style.backgroundColor="green";
+						}
+					}
+					//movimento in giu a destra
+					if(i<=7 && j<=7)
+					{					
+						var a=document.getElementById("img"+(i+1)+(j+1)+"").src;
+						var pos=a.lastIndexOf("/");
+						var srcRelativo=a.substring(pos+1);
+						
+						controlloMossaReBianco((i+1),(j+1));	//controllo se la mossa porta il re ad essere mangiato
+							
+						if(srcRelativo=="vuota.png" && mossaPossibileRe==0)	//se non c'e' un oggetto
+						{
+							possibileMovimento[contaMosse]=""+(i+1)+(j+1)+"";
+							contaMosse++;
+						}
+						else if((srcRelativo=="alfiere_n.png" || srcRelativo=="cavallo_n.png" || srcRelativo=="pedone_n.png" || srcRelativo=="re_n.png" || srcRelativo=="regina_n.png" || srcRelativo=="torre_n.png") && mossaPossibileRe==0)
+						{
+							possibileMangiataGiu=""+(i+1)+(j+1)+"";
+							document.getElementById("td"+possibileMangiataGiu+"").style.backgroundColor="green";
+						}
+					}
+					//movimento in giu
+					if(i<=7)
+					{					
+						var a=document.getElementById("img"+(i+1)+j+"").src;
+						var pos=a.lastIndexOf("/");
+						var srcRelativo=a.substring(pos+1);
+						
+						controlloMossaReBianco((i+1),j);	//controllo se la mossa porta il re ad essere mangiato
+							
+						if(srcRelativo=="vuota.png" && mossaPossibileRe==0)	//se non c'e' un oggetto
+						{
+							possibileMovimento[contaMosse]=""+(i+1)+j+"";
+							contaMosse++;
+						}
+						else if((srcRelativo=="alfiere_n.png" || srcRelativo=="cavallo_n.png" || srcRelativo=="pedone_n.png" || srcRelativo=="re_n.png" || srcRelativo=="regina_n.png" || srcRelativo=="torre_n.png") && mossaPossibileRe==0)
+						{
+							possibileMangiataGiu2=""+(i+1)+j+"";
+							document.getElementById("td"+possibileMangiataGiu2+"").style.backgroundColor="green";
+						}
+					}
+					//movimento in giu a sinistra
+					if(i<=7 && j>=2)
+					{					
+						var a=document.getElementById("img"+(i+1)+(j-1)+"").src;
+						var pos=a.lastIndexOf("/");
+						var srcRelativo=a.substring(pos+1);
+						
+						controlloMossaReBianco((i+1),(j-1));	//controllo se la mossa porta il re ad essere mangiato
+							
+						if(srcRelativo=="vuota.png" && mossaPossibileRe==0)	//se non c'e' un oggetto
+						{
+							possibileMovimento[contaMosse]=""+(i+1)+(j-1)+"";
+							contaMosse++;
+						}
+						else if((srcRelativo=="alfiere_n.png" || srcRelativo=="cavallo_n.png" || srcRelativo=="pedone_n.png" || srcRelativo=="re_n.png" || srcRelativo=="regina_n.png" || srcRelativo=="torre_n.png") && mossaPossibileRe==0)
+						{
+							possibileMangiataSX=""+(i+1)+(j-1)+"";
+							document.getElementById("td"+possibileMangiataSX+"").style.backgroundColor="green";
+						}
+					}
+					//movimento a sinistra
+					if(j>=2)
+					{					
+						var a=document.getElementById("img"+i+(j-1)+"").src;
+						var pos=a.lastIndexOf("/");
+						var srcRelativo=a.substring(pos+1);
+						
+						controlloMossaReBianco(i,(j-1));	//controllo se la mossa porta il re ad essere mangiato
+							
+						if(srcRelativo=="vuota.png" && mossaPossibileRe==0)	//se non c'e' un oggetto
+						{
+							possibileMovimento[contaMosse]=""+i+(j-1)+"";
+							contaMosse++;
+						}
+						else if((srcRelativo=="alfiere_n.png" || srcRelativo=="cavallo_n.png" || srcRelativo=="pedone_n.png" || srcRelativo=="re_n.png" || srcRelativo=="regina_n.png" || srcRelativo=="torre_n.png") && mossaPossibileRe==0)
+						{
+							possibileMangiataSX2=""+i+(j-1)+"";
+							document.getElementById("td"+possibileMangiataSX2+"").style.backgroundColor="green";
+						}
+					}
+					
+					//possibile arrocco dx
+					if(contaMossePerArroccoBiancoDestra==0)
+					{
+						arroccoDestra=0;
+						var a=document.getElementById("img"+i+(j+1)+"").src;	//cella [8,6]
+						var pos=a.lastIndexOf("/");
+						var srcRelativo=a.substring(pos+1);
+						
+						if(srcRelativo=="vuota.png")	//se non c'e' un oggetto
+						{
+							arroccoDestra++;
+						}
+						var a=document.getElementById("img"+i+(j+2)+"").src;	//cella [8,7]
+						var pos=a.lastIndexOf("/");
+						var srcRelativo=a.substring(pos+1);
+						
+						if(srcRelativo=="vuota.png")	//se non c'e' un oggetto
+						{
+							arroccoDestra++;
+						}
+						var a=document.getElementById("img"+i+(j+3)+"").src;	//cella [8,8]
+						var pos=a.lastIndexOf("/");
+						var srcRelativo=a.substring(pos+1);
+						
+						if(srcRelativo=="torre_b.png")	//se non c'e' un oggetto
+						{
+							arroccoDestra++;
+						}
+						
+						if(arroccoDestra==3) //arrocco destra
+						{
+							arroccoBiancoDestraPossibile=1;
+							document.getElementById("td87").style.backgroundColor="yellow";	//segnala arrocco
+						}
+					}
+					
+					//possibile arrocco sx
+					if(contaMossePerArroccoBiancoSinistra==0)
+					{
+						arroccoSinistra=0;
+						var a=document.getElementById("img"+i+(j-1)+"").src;	//cella [8,4]
+						var pos=a.lastIndexOf("/");
+						var srcRelativo=a.substring(pos+1);
+						
+						if(srcRelativo=="vuota.png")	//se non c'e' un oggetto
+						{
+							arroccoSinistra++;
+						}
+						var a=document.getElementById("img"+i+(j-2)+"").src;	//cella [8,3]
+						var pos=a.lastIndexOf("/");
+						var srcRelativo=a.substring(pos+1);
+						
+						if(srcRelativo=="vuota.png")	//se non c'e' un oggetto
+						{
+							arroccoSinistra++;
+						}
+						var a=document.getElementById("img"+i+(j-3)+"").src;	//cella [8,2]
+						var pos=a.lastIndexOf("/");
+						var srcRelativo=a.substring(pos+1);
+						
+						if(srcRelativo=="vuota.png")	//se non c'e' un oggetto
+						{
+							arroccoSinistra++;
+						}
+						var a=document.getElementById("img"+i+(j-4)+"").src;	//cella [8,1]
+						var pos=a.lastIndexOf("/");
+						var srcRelativo=a.substring(pos+1);
+						
+						if(srcRelativo=="torre_b.png")	//se non c'e' un oggetto
+						{
+							arroccoSinistra++;
+						}
+						
+						if(arroccoSinistra==4) //arrocco sinistra
+						{
+							arroccoBiancoSinistraPossibile=1;
+							document.getElementById("td82").style.backgroundColor="yellow";	//segnala arrocco
+						}
+					}
+					
+					
+					for(var contatore=0;contatore<contaMosse;contatore++)
+						document.getElementById("td"+possibileMovimento[contatore]+"").style.backgroundColor="lightblue";
+					turno=0;
+				}
+				else
+					alert("Tocca all'altro giocatore!");
+			}			
+			else //secondo oggetto selezionato : ricevente
+			{
+				document.getElementById("td"+vettore[0]+"").style.backgroundColor=vettore[2];
+				vettore[1]=""+i+j+"";
+								
+				//controllo movimento
+				for(var contatore=0;contatore<contaMosse;contatore++)
+				{
+					if(vettore[1]==possibileMovimento[contatore])
+					{
+						secondo();
+						break;
+					}
+				}
+				if(vettore[1]==possibileMangiataSX) //controllo mangiata SX
+					secondo();
+				else if (vettore[1]==possibileMangiataDX) //controllo mangiata DX
+					secondo();
+				else if (vettore[1]==possibileMangiataSu) //controllo mangiata Su
+					secondo();
+				else if (vettore[1]==possibileMangiataGiu) //controllo mangiata Giu
+					secondo();
+				else if(vettore[1]==possibileMangiataSX2) //controllo mangiata SX2(cavallo)
+					secondo();
+				else if (vettore[1]==possibileMangiataDX2) //controllo mangiata DX2(cavallo)
+					secondo();
+				else if (vettore[1]==possibileMangiataSu2) //controllo mangiata Su2(cavallo)
+					secondo();
+				else if (vettore[1]==possibileMangiataGiu2) //controllo mangiata Giu2(cavallo)
+					secondo();
+				else
+					mossaNonConsentita();
+			}
+		}
+		
+		</script>
+	</body>
+</html>
